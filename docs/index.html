@@ -315,8 +315,11 @@
   </footer>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/ethers@6.13.4/dist/ethers.min.js"></script>
-<script>
+<script type="importmap">
+{"imports": {"ethers": "https://cdn.jsdelivr.net/npm/ethers@6.13.4/dist/ethers.min.js"}}
+</script>
+<script type="module">
+import { ethers } from "ethers";
 (function(){
   var BASE_RPC = "https://sepolia.base.org";
   var LASNA_RPC = "https://lasna-rpc.rnk.dev/";
