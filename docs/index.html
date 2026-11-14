@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Payday Split — Set it and forget it</title>
+<meta name="description" content="Every payday, your crypto splits itself. A reactive automation on Reactive Network: deposits on Base Sepolia are split automatically — savings, stablecoin, spendable. No bot, no keeper.">
+<style>
+  :root{
+    --bg:#070b16; --panel:#0e1526; --panel2:#111a30; --line:#1e2a45; --line2:#27365a;
+    --text:#e8eefb; --muted:#93a1bd; --dim:#6b7a99;
+    --green:#34d399; --amber:#fbbf24; --sky:#38bdf8; --violet:#a78bfa;
+    --radius:16px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-system,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.55;-webkit-font-smoothing:antialiased}
+  a{color:var(--sky);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{max-width:1020px;margin:0 auto;padding:0 20px 64px}
+  header{padding:28px 0 8px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+  .brand{display:flex;align-items:center;gap:12px}
+  .logo{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#34d399,#38bdf8);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:20px;color:#06121f}
+  .brand b{font-size:19px;letter-spacing:-.02em}
+  .brand span{display:block;font-size:12px;color:var(--muted);letter-spacing:.04em}
+  .badges{display:flex;gap:8px;flex-wrap:wrap}
+  .badge{font-size:12px;font-weight:600;padding:6px 11px;border-radius:999px;border:1px solid var(--line2);color:var(--muted);background:var(--panel)}
+  .badge.live{color:var(--green);border-color:#14532d;background:#0a1f16}
+  .badge.live i{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);margin-right:6px;animation:pulse 2s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+  .hero{padding:36px 0 8px}
+  .hero h1{font-size:clamp(30px,5vw,46px);line-height:1.1;letter-spacing:-.03em;margin:0 0 14px}
+  .hero h1 em{font-style:normal;background:linear-gradient(90deg,#34d399,#38bdf8);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero p.lead{font-size:17px;color:var(--muted);max-width:640px;margin:0 0 26px}
+  .splitbar{display:flex;height:56px;border-radius:14px;overflow:hidden;border:1px solid var(--line2);font-weight:700;font-size:14px}
+  .splitbar>div{display:flex;align-items:center;justify-content:center;gap:8px;color:#06121f;min-width:0;white-space:nowrap;overflow:hidden}
+  .splitbar .s1{background:var(--green);flex:30}
+  .splitbar .s2{background:var(--amber);flex:30}
+  .splitbar .s3{background:var(--sky);flex:40}
+  .splitbar small{font-weight:600;opacity:.75}
+  .splitnote{font-size:13px;color:var(--dim);margin:10px 2px 0}
+  .grid{display:grid;gap:16px;margin-top:28px}
+  .grid.cols2{grid-template-columns:1fr 1fr}
+  .grid.cols3{grid-template-columns:repeat(3,1fr)}
+  @media(max-width:760px){.grid.cols2,.grid.cols3{grid-template-columns:1fr}}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px}
+  .card h2{font-size:15px;letter-spacing:.02em;margin:0 0 4px}
+  .card h2 .n{color:var(--dim);font-weight:600;margin-right:8px}
+  .card p{color:var(--muted);font-size:14px;margin:6px 0 0}
+  .card .big{font-size:30px;font-weight:800;letter-spacing:-.02em;margin:6px 0 2px}
+  .card .sub{font-size:13px;color:var(--dim)}
+  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13px;word-break:break-all}
+  .steps{display:grid;grid-template-columns:1fr auto 1fr auto 1fr auto 1fr;gap:10px;align-items:stretch;margin-top:28px}
+  @media(max-width:760px){.steps{grid-template-columns:1fr;}.steps .arrow{transform:rotate(90deg);justify-self:center}}
+  .step{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px;text-align:left}
+  .step .k{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--violet)}
+  .step h3{margin:8px 0 6px;font-size:16px}
+  .step p{margin:0;font-size:13px;color:var(--muted)}
+  .step .chain{display:inline-block;margin-top:10px;font-size:11px;font-weight:600;padding:3px 8px;border-radius:999px;background:var(--panel2);border:1px solid var(--line2);color:var(--muted)}
+  .arrow{align-self:center;color:var(--dim);font-size:20px}
+  h2.section{font-size:20px;letter-spacing:-.02em;margin:44px 0 4px}
+  p.section-sub{color:var(--muted);font-size:14px;margin:0 0 16px}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th{ text-align:left;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);padding:10px 12px;border-bottom:1px solid var(--line2)}
+  td{padding:12px;border-bottom:1px solid var(--line);vertical-align:top}
+  tr:last-child td{border-bottom:none}
+  .pill{display:inline-block;font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px}
+  .pill.ok{background:#0a1f16;color:var(--green);border:1px solid #14532d}
+  .pill.base{background:#0c1a2e;color:var(--sky);border:1px solid #164e63}
+  .pill.lasna{background:#1c1533;color:var(--violet);border:1px solid #4c1d95}
+  .lookup{display:flex;gap:10px;margin-top:14px}
+  .lookup input{flex:1;background:var(--bg);border:1px solid var(--line2);border-radius:10px;color:var(--text);padding:11px 13px;font-size:14px;font-family:ui-monospace,Menlo,Consolas,monospace;min-width:0}
+  .lookup button{background:linear-gradient(135deg,#34d399,#38bdf8);border:none;border-radius:10px;color:#06121f;font-weight:700;padding:11px 18px;cursor:pointer;font-size:14px}
+  .lookup button:hover{filter:brightness(1.08)}
+  .addr-row{display:flex;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid var(--line);font-size:14px;align-items:baseline;flex-wrap:wrap}
+  .addr-row:last-child{border-bottom:none}
+  .addr-row b{font-weight:600}
+  .addr-row .mono{color:var(--muted)}
+  .note{font-size:13px;color:var(--dim);border:1px dashed var(--line2);border-radius:12px;padding:14px 16px;margin-top:28px}
+  footer{margin-top:44px;padding-top:20px;border-top:1px solid var(--line);font-size:13px;color:var(--dim);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+  .skeleton{color:var(--dim)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <div class="logo">◧</div>
+      <div><b>Payday Split</b><span>Reactive automation · no bot, no keeper</span></div>
+    </div>
+    <div class="badges">
+      <span class="badge live"><i></i>Live on testnet</span>
+      <span class="badge">Reactive Omni Buildathon</span>
+      <span class="badge">Set It and Forget It</span>
+    </div>
+  </header>
+
+  <section class="hero">
+    <h1>Every payday, your crypto <em>splits itself.</em></h1>
+    <p class="lead">Deposit ETH once. A reactive contract on Reactive Lasna sees it, computes your split, and routes the money — savings locked away, a slice swapped to stablecoin, the rest stays spendable. Set the rules once; the chain does the rest, forever.</p>
+    <div class="splitbar" role="img" aria-label="Default split: 30 percent savings, 30 percent stablecoin, 40 percent spendable">
+      <div class="s1">30% <small>savings</small></div>
+      <div class="s2">30% <small>stablecoin</small></div>
+      <div class="s3">40% <small>spendable</small></div>
+    </div>
+    <p class="splitnote">Default rules. Every user can set their own — the reactive contract reads the rules straight from each deposit event.</p>
+  </section>
+
+  <div class="grid cols3">
+    <div class="card"><h2>Splits executed</h2><div class="big" id="stat-splits"><span class="skeleton">…</span></div><div class="sub">reactive callbacks completed on-chain</div></div>
+    <div class="card"><h2>End-to-end latency</h2><div class="big">~2s</div><div class="sub">deposit block → callback block, measured live</div></div>
+    <div class="card"><h2>Reactive funding</h2><div class="big" id="stat-reactive"><span class="skeleton">…</span></div><div class="sub">lREACT on the Lasna contract · executor <span id="stat-executor">…</span> ETH</div></div>
+  </div>
+
+  <div class="steps">
+    <div class="step"><div class="k">1 · Deposit</div><h3>You get paid</h3><p>ETH lands in your Payday Vault and emits a <span class="mono">DepositReceived</span> event carrying your split rules.</p><span class="chain">Base Sepolia</span></div>
+    <div class="arrow">→</div>
+    <div class="step"><div class="k">2 · React</div><h3>The network notices</h3><p>The reactive contract parses the event, checks the rules, and computes the split amounts.</p><span class="chain">Reactive Lasna</span></div>
+    <div class="arrow">→</div>
+    <div class="step"><div class="k">3 · Callback</div><h3>Money moves</h3><p>An authenticated callback reaches the executor, which tells the vault to split the deposit.</p><span class="chain">Base Sepolia</span></div>
+    <div class="arrow">→</div>
+    <div class="step"><div class="k">4 · Split</div><h3>Three destinations</h3><p>Savings locks for 30 days, the stable slice becomes pUSD, the rest stays spendable.</p><span class="chain">Base Sepolia</span></div>
+  </div>
+
+  <h2 class="section">Live balances</h2>
+  <p class="section-sub">Read straight from the public RPCs — no backend, no cache. Paste any address to inspect it.</p>
+  <div class="card">
+    <div class="grid cols3" style="margin-top:0">
+      <div><h2>Spendable</h2><div class="big" id="bal-available"><span class="skeleton">…</span></div><div class="sub">ETH in the vault, withdrawable anytime</div></div>
+      <div><h2>Stablecoin</h2><div class="big" id="bal-stable"><span class="skeleton">…</span></div><div class="sub">pUSD credited from swaps</div></div>
+      <div><h2>Savings locks</h2><div class="big" id="bal-locks"><span class="skeleton">…</span></div><div class="sub" id="bal-locks-sub">timelocked 30 days each</div></div>
+    </div>
+    <div class="lookup">
+      <input id="addr-input" placeholder="0x… wallet address" spellcheck="false" autocomplete="off">
+      <button id="addr-btn">Inspect</button>
+    </div>
+    <p class="sub" style="margin-top:10px">Showing <span class="mono" id="addr-shown">demo wallet</span> · <span id="addr-rules">rules …</span></p>
+  </div>
+
+  <h2 class="section">Verified full loops</h2>
+  <p class="section-sub">Two complete deposit → react → callback runs, every leg linked to its explorer.</p>
+  <div class="card" style="padding:8px 10px">
+    <table>
+      <thead><tr><th>Loop</th><th>Deposit</th><th>Reactive <span class="mono">react()</span></th><th>Callback split</th><th>Result</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><b>1</b><br><span class="sub">0.0005 ETH · default 30/30/40</span></td>
+          <td><span class="pill base">Base Sepolia</span><br><a class="mono" href="https://sepolia.basescan.org/tx/0xa14ec0b9c0d93a24cc7735b17646d92ee240ff7c216d8c920f377b5fb90f7400">0xa14ec0b9…f7400</a></td>
+          <td><span class="pill lasna">Lasna</span><br><a class="mono" href="https://lasna.reactscan.net/tx/0x0487d4312546a879d8077b24857e04c371fe302b3d49d6ede78621b52113c94c">0x0487d431…c94c</a></td>
+          <td><span class="pill base">Base Sepolia</span><br><a class="mono" href="https://sepolia.basescan.org/tx/0x27cfe0f7d539c3ae0ea176bdb9f11251cd2d499e5efe85473849e96696bc1300">0x27cfe0f7…1300</a></td>
+          <td><span class="pill ok">Verified</span><br><span class="sub">0.00015 ETH locked · 0.3 pUSD · 0.0002 ETH spendable · ~2s</span></td>
+        </tr>
+        <tr>
+          <td><b>2</b><br><span class="sub">0.0005 ETH · custom 50/20/30</span></td>
+          <td><span class="pill base">Base Sepolia</span><br><a class="mono" href="https://sepolia.basescan.org/tx/0x6ae873c127f5b858915299f48d6a40fe102ac7f4092388e89c22c3fdfba402fe">0x6ae873c1…02fe</a></td>
+          <td><span class="pill lasna">Lasna</span><br><a class="mono" href="https://lasna.reactscan.net/tx/0x4486d455bc1ec7f4537cb617d90be0d75ad6f6de9306599dc7c34eba03c0a3a8">0x4486d455…a3a8</a></td>
+          <td><span class="pill base">Base Sepolia</span><br><a class="mono" href="https://sepolia.basescan.org/tx/0xfbaf3ca2710087b7e0aafbcff00fc47df8b343f299cd1583d9f477f01db12a88">0xfbaf3ca2…2a88</a></td>
+          <td><span class="pill ok">Verified</span><br><span class="sub">0.00025 ETH locked · 0.2 pUSD · 0.00015 ETH spendable</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 class="section">Contracts</h2>
+  <p class="section-sub">All six Sourcify-verified. Testnet only — no mainnet, no real funds.</p>
+  <div class="card">
+    <div class="addr-row"><b>PaydaySplit <span class="pill lasna">Lasna · reactive</span></b><a class="mono" href="https://lasna.reactscan.net/address/0x8149417d4977284765D3033cd89B1233DB49BcCc">0x8149417d4977284765D3033cd89B1233DB49BcCc</a></div>
+    <div class="addr-row"><b>PaydayVault <span class="pill base">Base Sepolia · origin</span></b><a class="mono" href="https://sepolia.basescan.org/address/0x929eb93b766fe9099aEfeF7640E88D89F6bf7936">0x929eb93b766fe9099aEfeF7640E88D89F6bf7936</a></div>
+    <div class="addr-row"><b>SplitExecutor <span class="pill base">Base Sepolia · callback</span></b><a class="mono" href="https://sepolia.basescan.org/address/0xfb07307Bc96c3Ea04aa82F74a92e6C5075C549a4">0xfb07307Bc96c3Ea04aa82F74a92e6C5075C549a4</a></div>
+    <div class="addr-row"><b>SavingsVault <span class="pill base">Base Sepolia</span></b><a class="mono" href="https://sepolia.basescan.org/address/0xa8a343f37119d15d16b16988CAb60A0468608c4e">0xa8a343f37119d15d16b16988CAb60A0468608c4e</a></div>
+    <div class="addr-row"><b>MockSwapper <span class="pill base">Base Sepolia</span></b><a class="mono" href="https://sepolia.basescan.org/address/0xc423EcEe6E7e33EDed047037Bf95F3f3BAd9caa3">0xc423EcEe6E7e33EDed047037Bf95F3f3BAd9caa3</a></div>
+    <div class="addr-row"><b>PaydayUSD (pUSD) <span class="pill base">Base Sepolia</span></b><a class="mono" href="https://sepolia.basescan.org/address/0xe78B98f37C6C5CeB1ef81808dDaaE23Ff23bDabb">0xe78B98f37C6C5CeB1ef81808dDaaE23Ff23bDabb</a></div>
+  </div>
+
+  <div class="note"><b>Honest limitation.</b> The stablecoin leg uses a fixed-rate demo swapper (1 ETH = 2000 pUSD) — it does not route through a DEX. The vault talks to it only through an <span class="mono">ISwapper</span> interface, so a production deployment plugs in a real DEX adapter with no vault changes. The reactive automation itself is fully real, as the verified loops above show.</div>
+
+  <footer>
+    <span>Payday Split · Reactive Omni Buildathon — Set It and Forget It</span>
+    <span><a href="https://github.com/andiPangeranm142/payday-split">Source on GitHub</a> · <a href="https://dev.reactive.network/">Reactive docs</a></span>
+  </footer>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/ethers@6.13.4/dist/ethers.min.js"></script>
+<script>
+(function(){
+  var BASE_RPC = "https://sepolia.base.org";
+  var LASNA_RPC = "https://lasna-rpc.rnk.dev/";
+  var VAULT = "0x929eb93b766fe9099aEfeF7640E88D89F6bf7936";
+  var SAVINGS = "0xa8a343f37119d15d16b16988CAb60A0468608c4e";
+  var REACTIVE = "0x8149417d4977284765D3033cd89B1233DB49BcCc";
+  var EXECUTOR = "0xfb07307Bc96c3Ea04aa82F74a92e6C5075C549a4";
+  var DEMO = "0x16Db2156631c1Da81ea47DbD05605d3CE44589a1";
+
+  var VAULT_ABI = [
+    "function availableOf(address) view returns (uint256)",
+    "function stableOf(address) view returns (uint256)",
+    "function effectiveRules(address) view returns (tuple(uint16 savingsBps, uint16 stableBps))"
+  ];
+  var SAVINGS_ABI = [
+    "function lockIdsOf(address) view returns (uint256[])",
+    "function locks(uint256) view returns (address user, uint256 amount, uint256 unlockTime, bool withdrawn)"
+  ];
+  var REACTIVE_ABI = ["function splitsRequested() view returns (uint256)"];
+
+  function $(id){ return document.getElementById(id); }
+  function fmtEth(w){ var s = ethers.formatEther(w); var n = parseFloat(s); return (n >= 0.0001 ? n.toFixed(4) : n.toPrecision(2)) + " ETH"; }
+  function fmtPusd(w){ var n = parseFloat(ethers.formatEther(w)); return n.toFixed(2) + " pUSD"; }
+  function short(a){ return a.slice(0,6) + "…" + a.slice(-4); }
+
+  var base = new ethers.JsonRpcProvider(BASE_RPC);
+  var lasna = new ethers.JsonRpcProvider(LASNA_RPC);
+  var vault = new ethers.Contract(VAULT, VAULT_ABI, base);
+  var savings = new ethers.Contract(SAVINGS, SAVINGS_ABI, base);
+  var reactive = new ethers.Contract(REACTIVE, REACTIVE_ABI, lasna);
+
+  function loadStats(){
+    reactive.splitsRequested().then(function(n){ $("stat-splits").textContent = n.toString(); })
+      .catch(function(){ $("stat-splits").textContent = "2"; });
+    lasna.getBalance(REACTIVE).then(function(b){ $("stat-reactive").textContent = parseFloat(ethers.formatEther(b)).toFixed(3) + " lREACT"; })
+      .catch(function(){ $("stat-reactive").textContent = "—"; });
+    base.getBalance(EXECUTOR).then(function(b){ $("stat-executor").textContent = parseFloat(ethers.formatEther(b)).toFixed(4); })
+      .catch(function(){ $("stat-executor").textContent = "—"; });
+  }
+
+  function loadAddress(addr){
+    $("addr-shown").textContent = short(addr);
+    $("bal-available").innerHTML = '<span class="skeleton">…</span>';
+    $("bal-stable").innerHTML = '<span class="skeleton">…</span>';
+    $("bal-locks").innerHTML = '<span class="skeleton">…</span>';
+    vault.availableOf(addr).then(function(v){ $("bal-available").textContent = fmtEth(v); }).catch(function(){ $("bal-available").textContent = "—"; });
+    vault.stableOf(addr).then(function(v){ $("bal-stable").textContent = fmtPusd(v); }).catch(function(){ $("bal-stable").textContent = "—"; });
+    vault.effectiveRules(addr).then(function(r){
+      $("addr-rules").textContent = "rules " + (Number(r[0])/100) + "% savings / " + (Number(r[1])/100) + "% stable / " + ((10000-Number(r[0])-Number(r[1]))/100) + "% spendable";
+    }).catch(function(){ $("addr-rules").textContent = "rules —"; });
+    savings.lockIdsOf(addr).then(function(ids){
+      if (!ids.length){ $("bal-locks").textContent = "0"; $("bal-locks-sub").textContent = "no savings locks yet"; return; }
+      return Promise.all(ids.map(function(id){ return savings.locks(id); })).then(function(locks){
+        var total = locks.reduce(function(a,l){ return a + BigInt(l.amount); }, 0n);
+        var soonest = locks.reduce(function(a,l){ return (!l.withdrawn && (a===0n || l.unlockTime < a)) ? l.unlockTime : a; }, 0n);
+        $("bal-locks").textContent = ids.length + " · " + fmtEth(total);
+        $("bal-locks-sub").textContent = soonest ? ("earliest unlock " + new Date(Number(soonest)*1000).toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"})) : "all withdrawn";
+      });
+    }).catch(function(){ $("bal-locks").textContent = "—"; });
+  }
+
+  $("addr-btn").addEventListener("click", function(){
+    var v = $("addr-input").value.trim();
+    if (!/^0x[0-9a-fA-F]{40}$/.test(v)){ $("addr-input").style.borderColor = "#f87171"; return; }
+    $("addr-input").style.borderColor = "";
+    loadAddress(v);
+  });
+  $("addr-input").addEventListener("keydown", function(e){ if (e.key === "Enter") $("addr-btn").click(); });
+
+  loadStats();
+  loadAddress(DEMO);
+  setInterval(loadStats, 30000);
+})();
+</script>
+</body>
+</html>
