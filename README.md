@@ -6,7 +6,7 @@ Payday Split is a "set it and forget it" automation built on [Reactive Network](
 
 No keeper. No cron job. No off-chain bot. The automation lives entirely on-chain.
 
-## The loop (verified live, twice)
+## The loop (verified live, three times)
 
 ```
 User deposits ETH ──► PaydayVault (Base Sepolia) ──► DepositReceived event
@@ -46,7 +46,17 @@ Result: 0.00015 ETH locked in savings (lock #0, 30 days), 0.3 pUSD credited, 0.0
 | Reactive `react()` | Lasna | [`0x4486d455…a3a8`](https://lasna.reactscan.net/tx/0x4486d455bc1ec7f4537cb617d90be0d75ad6f6de9306599dc7c34eba03c0a3a8) |
 | Callback split | Base Sepolia | [`0xfbaf3ca2…2a88`](https://sepolia.basescan.org/tx/0xfbaf3ca2710087b7e0aafbcff00fc47df8b343f299cd1583d9f477f01db12a88) |
 
-Result: 0.00025 ETH locked in savings (lock #1), 0.2 pUSD credited, 0.00015 ETH spendable. Same user, different rules — the reactive contract read the new rules straight from the deposit event.
+Result: 0.00025 ETH locked in savings (lock #1), 0.2 pUSD credited, 0.00015 ETH spendable. Same user, different rules — the reactive contract read the new rules straight from the deposit event. Deposit block → callback block: **3 seconds**.
+
+**Loop 3** — custom rules (50% savings / 20% stable / 30% spendable, unchanged from Loop 2), 0.0001 ETH — the demo-video loop:
+
+| Leg | Chain | Transaction |
+| --- | --- | --- |
+| Deposit | Base Sepolia | [`0x66775dfc…02368`](https://sepolia.basescan.org/tx/0x66775dfc09b7e8a26f4e73a90688814d3ca276e8869d4c6bbd1aff303b802368) |
+| Reactive `react()` | Lasna | [`0x48d57819…3b375`](https://lasna.reactscan.net/tx/0x48d578197932182723df51ff9e60fe26c59cf30ecdec5fd3c280c6d6aed3b375) |
+| Callback split | Base Sepolia | [`0x0c7c436d…c951d`](https://sepolia.basescan.org/tx/0x0c7c436d0a2b8f46f5c9fb086903a9e8c948880ae1ece947bec834ac60ac951d) |
+
+Result: 0.00005 ETH locked in savings (lock #2), 0.04 pUSD credited, 0.00003 ETH spendable. Deposit block → callback block: **2 seconds**. This is the loop filmed in the [demo video](https://www.youtube.com/watch?v=6j7lKUyHwgo).
 
 📊 **Live dashboard:** https://andipangeranm142.github.io/payday-split/ — rules, live balances, split history, and explorer links, read straight from the public RPCs.
 
@@ -69,6 +79,8 @@ Supporting infrastructure: Base Sepolia callback proxy `0x476F44b11F5C942c58f4c8
 - **Rules live in the event, not in a second source of truth.** The vault embeds the user's current rules in `DepositReceived`, so the reactive side is stateless w.r.t. rules and always applies exactly what the user set at deposit time.
 - **Callbacks are doubly authenticated.** `SplitExecutor` requires both `onlyServiceProvider` (caller is the Reactive callback proxy) and `onlyCallbackSender` (origin is our reactive contract). Nobody else can trigger a split.
 - **Money only moves through the split path or the user's own withdrawal.** The owner cannot touch user funds.
+- **Percentage splits can't underfund.** Each leg is a share of the deposited amount, so every leg always has exactly what it needs — there is no "insufficient balance" failure path the way a fixed-amount payout has. The reactive contract enforces a minimum deposit instead, so dust deposits never trigger a split.
+- **Withdrawals unlock after 30 days.** `SavingsVault.withdraw()` is covered by the Foundry suite; no lock has matured yet on testnet (earliest unlock 14 Dec 2026), so a live withdrawal can't be shown until then.
 
 ## Contracts
 
