@@ -236,11 +236,11 @@
   <div class="grid cols3">
     <div class="card">
       <div class="stat-ic g"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
-      <h2>Splits executed</h2><div class="big" id="stat-splits"><span class="skeleton">…</span></div><div class="sub">reactive callbacks completed on-chain</div>
+      <h2>Splits executed</h2><div class="big" id="stat-splits"><span class="skeleton">…</span></div><div class="sub">reactive callbacks completed on-chain (v2 contract; v1 has 7 more)</div>
     </div>
     <div class="card">
       <div class="stat-ic v"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
-      <h2>End-to-end latency</h2><div class="big">~1s</div><div class="sub">deposit block → callback block, measured live (v2)</div>
+      <h2>End-to-end latency</h2><div class="big">~1s</div><div class="sub">deposit block → callback block, measured live (v2-1/2/3); v2-4 took 74 min in a network-wide relayer stall</div>
     </div>
     <div class="card">
       <div class="stat-ic s"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></div>
@@ -274,7 +274,7 @@
   </div>
 
   <h2 class="section">Verified <span class="grad">full loops</span></h2>
-  <p class="section-sub">Eight complete deposit → react → callback runs across two versions, every leg linked to its explorer.</p>
+  <p class="section-sub">Eleven complete deposit → react → callback runs across two versions, every leg linked to its explorer.</p>
   <h3 style="font-family:Sora,sans-serif;font-size:16px;margin:18px 0 8px">v2 — real Uniswap swap <span class="pill ok">current</span></h3>
   <div class="card" style="padding:8px 10px">
     <table>
@@ -301,10 +301,17 @@
           <td><span class="pill base">Base Sepolia</span><br><a class="mono" href="https://sepolia.basescan.org/tx/0x7571eb4dd396ebb0aee1f30bb7a27d4df2b04d95fa2acaed6aa14b96eeef21c1">0x7571eb4d…21c1</a></td>
           <td><span class="pill ok">Verified</span><br><span class="sub">0.00001 ETH locked · 2.124652 USDC · 0.00001 ETH spendable · 1s</span></td>
         </tr>
+        <tr>
+          <td><b>v2-4</b><br><span class="sub">0.0001 ETH · custom 10/80/10</span></td>
+          <td><span class="pill base">Base Sepolia</span><br><a class="mono" href="https://sepolia.basescan.org/tx/0x8058e54bf7cddfa2dcea8a76ad0ba77d99657211438a7287e1f9e8f098a5f369">0x8058e54b…f369</a></td>
+          <td><span class="pill lasna">Lasna</span><br><a class="mono" href="https://lasna.reactscan.net/tx/0x2277ed74db38f141ab5d3116ccab31dd99cf7ad4a010ecb3d728586d879f28ba">0x2277ed74…28ba</a></td>
+          <td><span class="pill base">Base Sepolia</span><br><a class="mono" href="https://sepolia.basescan.org/tx/0x057aa2118754163511135c3afbdfacd78be7fad4fe1b91bd66eb2a0600287e05">0x057aa211…7e05</a></td>
+          <td><span class="pill ok">Verified</span><br><span class="sub">0.00001 ETH locked · 2.160696 USDC · 0.00001 ETH spendable · 74m 53s (network-wide relayer stall 18:53–20:36 UTC 19 Nov, recovered)</span></td>
+        </tr>
       </tbody>
     </table>
   </div>
-  <p class="sub" style="margin-top:10px">v2 totals: 0.0005 ETH deposited → 0.00017 ETH locked · <b style="color:var(--text)">5.046334 USDC</b> out · 0.00014 ETH spendable. The testnet pool prices ETH at ~$26,500 (seeded arbitrarily); the swap route is the production Uniswap path.</p>
+  <p class="sub" style="margin-top:10px">v2 totals: 0.0006 ETH deposited → 0.00018 ETH locked · <b style="color:var(--text)">7.207030 USDC</b> out · 0.00015 ETH spendable. The testnet pool prices ETH at ~$26,500 (seeded arbitrarily); the swap route is the production Uniswap path. Loop v2-3 is filmed in the <a href="https://youtu.be/4tu7wUEud2c">v2 demo video</a>.</p>
   <h3 style="font-family:Sora,sans-serif;font-size:16px;margin:22px 0 8px">v1 — mock swapper + pUSD</h3>
   <div class="card" style="padding:8px 10px">
     <table>
@@ -345,11 +352,25 @@
           <td><span class="pill base">Base Sepolia</span><br><a class="mono" href="https://sepolia.basescan.org/tx/0x3f3213ae8ab3c1d3fe044c49e5399759a1639a90f9786a4158a1f00f8b1c0db0">0x3f3213ae…c0db0</a></td>
           <td><span class="pill ok">Verified</span><br><span class="sub">0.00001 ETH locked · 0.16 pUSD · 0.00001 ETH spendable · ~1s</span></td>
         </tr>
+        <tr>
+          <td><b>2nd user #1</b><br><span class="sub">0.0001 ETH · default 30/30/40<br>wallet 0x9e63…0200</span></td>
+          <td><span class="pill base">Base Sepolia</span><br><a class="mono" href="https://sepolia.basescan.org/tx/0x8987f5eec4b0f4dfac6734fdca7b3b930f66c4ada382c85de12a328ae45dac92">0x8987f5ee…ac92</a></td>
+          <td><span class="pill lasna">Lasna</span><br><a class="mono" href="https://lasna.reactscan.net/tx/0xc40017973d4d72908cc3002f345a92170483d3d326effeab32a886d8db49c9b8">0xc4001797…c9b8</a></td>
+          <td><span class="pill base">Base Sepolia</span><br><a class="mono" href="https://sepolia.basescan.org/tx/0xdc4d664f831a719f20f64d42fea722e903f4be8c03213d4523cf59a884f7c595">0xdc4d664f…c595</a></td>
+          <td><span class="pill ok">Verified</span><br><span class="sub">0.00003 ETH locked · 0.06 pUSD · 0.00004 ETH spendable · ~1s</span></td>
+        </tr>
+        <tr>
+          <td><b>2nd user #2</b><br><span class="sub">0.0001 ETH · own rules 40/40/20<br>wallet 0x9e63…0200</span></td>
+          <td><span class="pill base">Base Sepolia</span><br><a class="mono" href="https://sepolia.basescan.org/tx/0x02906672e944983b9139cb9a1b8cb6f855b263484efd198315fd252ccb28f424">0x02906672…f424</a></td>
+          <td><span class="pill lasna">Lasna</span><br><a class="mono" href="https://lasna.reactscan.net/tx/0x3c5dbfcc10526d04b505e840478ebeed79f2425e7a16671ec601e1f8340de9c4">0x3c5dbfcc…e9c4</a></td>
+          <td><span class="pill base">Base Sepolia</span><br><a class="mono" href="https://sepolia.basescan.org/tx/0x4903d13a1ad699378d4b47db1910cbf95830ed1a6523e1ee3a7a5bc40301a3d8">0x4903d13a…a3d8</a></td>
+          <td><span class="pill ok">Verified</span><br><span class="sub">0.00004 ETH locked · 0.08 pUSD · 0.00002 ETH spendable · ~2s</span></td>
+        </tr>
       </tbody>
     </table>
   </div>
   <details class="card" style="padding:12px 16px;margin-top:10px">
-    <summary style="cursor:pointer"><b>Full transaction hashes</b> <span class="sub">— every leg, all eight loops (v2 + v1)</span></summary>
+    <summary style="cursor:pointer"><b>Full transaction hashes</b> <span class="sub">— every leg, all eleven loops (v2 + v1 + second user)</span></summary>
     <div style="margin-top:10px;font-size:13px;line-height:1.9">
       <b>Loop v2-1</b> — deposit <a class="mono" href="https://sepolia.basescan.org/tx/0x23ee6e0b00ff24c8d48dd1b50341af213ccfe4a30328411b35f3fcc3ac5edc0c" style="word-break:break-all">0x23ee6e0b00ff24c8d48dd1b50341af213ccfe4a30328411b35f3fcc3ac5edc0c</a><br>
       <span style="margin-left:52px">reactive <a class="mono" href="https://lasna.reactscan.net/tx/0xef91c9b85ac4cb37c40f1dd702b1d6309128ef50c4fd1f5387445daad32ead39" style="word-break:break-all">0xef91c9b85ac4cb37c40f1dd702b1d6309128ef50c4fd1f5387445daad32ead39</a><br></span>
@@ -360,6 +381,9 @@
       <b>Loop v2-3</b> — deposit <a class="mono" href="https://sepolia.basescan.org/tx/0x004a75f488790c3907a83a0e6645b4799f2f0465b8418224d7a262af95227ecb" style="word-break:break-all">0x004a75f488790c3907a83a0e6645b4799f2f0465b8418224d7a262af95227ecb</a><br>
       <span style="margin-left:52px">reactive <a class="mono" href="https://lasna.reactscan.net/tx/0x0d40933441493a60cfdc629f2595f465b5be0adc892c5e07469a5ead813463f3" style="word-break:break-all">0x0d40933441493a60cfdc629f2595f465b5be0adc892c5e07469a5ead813463f3</a><br></span>
       <span style="margin-left:52px">callback <a class="mono" href="https://sepolia.basescan.org/tx/0x7571eb4dd396ebb0aee1f30bb7a27d4df2b04d95fa2acaed6aa14b96eeef21c1" style="word-break:break-all">0x7571eb4dd396ebb0aee1f30bb7a27d4df2b04d95fa2acaed6aa14b96eeef21c1</a></span><br>
+      <b>Loop v2-4</b> — deposit <a class="mono" href="https://sepolia.basescan.org/tx/0x8058e54bf7cddfa2dcea8a76ad0ba77d99657211438a7287e1f9e8f098a5f369" style="word-break:break-all">0x8058e54bf7cddfa2dcea8a76ad0ba77d99657211438a7287e1f9e8f098a5f369</a><br>
+      <span style="margin-left:52px">reactive <a class="mono" href="https://lasna.reactscan.net/tx/0x2277ed74db38f141ab5d3116ccab31dd99cf7ad4a010ecb3d728586d879f28ba" style="word-break:break-all">0x2277ed74db38f141ab5d3116ccab31dd99cf7ad4a010ecb3d728586d879f28ba</a><br></span>
+      <span style="margin-left:52px">callback <a class="mono" href="https://sepolia.basescan.org/tx/0x057aa2118754163511135c3afbdfacd78be7fad4fe1b91bd66eb2a0600287e05" style="word-break:break-all">0x057aa2118754163511135c3afbdfacd78be7fad4fe1b91bd66eb2a0600287e05</a></span><br>
       <b>Loop 1</b> — deposit <a class="mono" href="https://sepolia.basescan.org/tx/0xa14ec0b9c0d93a24cc7735b17646d92ee240ff7c216d8c920f377b5fb90f7400" style="word-break:break-all">0xa14ec0b9c0d93a24cc7735b17646d92ee240ff7c216d8c920f377b5fb90f7400</a><br>
       <span style="margin-left:52px">reactive <a class="mono" href="https://lasna.reactscan.net/tx/0x0487d4312546a879d8077b24857e04c371fe302b3d49d6ede78621b52113c94c" style="word-break:break-all">0x0487d4312546a879d8077b24857e04c371fe302b3d49d6ede78621b52113c94c</a><br></span>
       <span style="margin-left:52px">callback <a class="mono" href="https://sepolia.basescan.org/tx/0x27cfe0f7d539c3ae0ea176bdb9f11251cd2d499e5efe85473849e96696bc1300" style="word-break:break-all">0x27cfe0f7d539c3ae0ea176bdb9f11251cd2d499e5efe85473849e96696bc1300</a></span><br>
@@ -374,7 +398,13 @@
       <span style="margin-left:52px">callback <a class="mono" href="https://sepolia.basescan.org/tx/0xf599a824fc02b5d629b94a546f2177855a59d5911153b0b18508596dfa15c51d" style="word-break:break-all">0xf599a824fc02b5d629b94a546f2177855a59d5911153b0b18508596dfa15c51d</a></span><br>
       <b>Loop 5</b> — deposit <a class="mono" href="https://sepolia.basescan.org/tx/0x58c5641349e57c62f72968709eaa1ea63f0571e17730cee4e696f4381511ff7a" style="word-break:break-all">0x58c5641349e57c62f72968709eaa1ea63f0571e17730cee4e696f4381511ff7a</a><br>
       <span style="margin-left:52px">reactive <a class="mono" href="https://lasna.reactscan.net/tx/0xdc2fdb0e6c14b2f9d05c5a8b6d66bda8775f858245f834aad30ee08fde6db0f1" style="word-break:break-all">0xdc2fdb0e6c14b2f9d05c5a8b6d66bda8775f858245f834aad30ee08fde6db0f1</a><br></span>
-      <span style="margin-left:52px">callback <a class="mono" href="https://sepolia.basescan.org/tx/0x3f3213ae8ab3c1d3fe044c49e5399759a1639a90f9786a4158a1f00f8b1c0db0" style="word-break:break-all">0x3f3213ae8ab3c1d3fe044c49e5399759a1639a90f9786a4158a1f00f8b1c0db0</a></span>
+      <span style="margin-left:52px">callback <a class="mono" href="https://sepolia.basescan.org/tx/0x3f3213ae8ab3c1d3fe044c49e5399759a1639a90f9786a4158a1f00f8b1c0db0" style="word-break:break-all">0x3f3213ae8ab3c1d3fe044c49e5399759a1639a90f9786a4158a1f00f8b1c0db0</a></span><br>
+      <b>2nd user #1</b> — deposit <a class="mono" href="https://sepolia.basescan.org/tx/0x8987f5eec4b0f4dfac6734fdca7b3b930f66c4ada382c85de12a328ae45dac92" style="word-break:break-all">0x8987f5eec4b0f4dfac6734fdca7b3b930f66c4ada382c85de12a328ae45dac92</a><br>
+      <span style="margin-left:52px">reactive <a class="mono" href="https://lasna.reactscan.net/tx/0xc40017973d4d72908cc3002f345a92170483d3d326effeab32a886d8db49c9b8" style="word-break:break-all">0xc40017973d4d72908cc3002f345a92170483d3d326effeab32a886d8db49c9b8</a><br></span>
+      <span style="margin-left:52px">callback <a class="mono" href="https://sepolia.basescan.org/tx/0xdc4d664f831a719f20f64d42fea722e903f4be8c03213d4523cf59a884f7c595" style="word-break:break-all">0xdc4d664f831a719f20f64d42fea722e903f4be8c03213d4523cf59a884f7c595</a></span><br>
+      <b>2nd user #2</b> — deposit <a class="mono" href="https://sepolia.basescan.org/tx/0x02906672e944983b9139cb9a1b8cb6f855b263484efd198315fd252ccb28f424" style="word-break:break-all">0x02906672e944983b9139cb9a1b8cb6f855b263484efd198315fd252ccb28f424</a><br>
+      <span style="margin-left:52px">reactive <a class="mono" href="https://lasna.reactscan.net/tx/0x3c5dbfcc10526d04b505e840478ebeed79f2425e7a16671ec601e1f8340de9c4" style="word-break:break-all">0x3c5dbfcc10526d04b505e840478ebeed79f2425e7a16671ec601e1f8340de9c4</a><br></span>
+      <span style="margin-left:52px">callback <a class="mono" href="https://sepolia.basescan.org/tx/0x4903d13a1ad699378d4b47db1910cbf95830ed1a6523e1ee3a7a5bc40301a3d8" style="word-break:break-all">0x4903d13a1ad699378d4b47db1910cbf95830ed1a6523e1ee3a7a5bc40301a3d8</a></span>
     </div>
   </details>
 
@@ -412,7 +442,7 @@
 
   <footer>
     <span>Payday Split · Reactive Omni Buildathon — Set It and Forget It</span>
-    <span><a href="https://github.com/andiPangeranm142/payday-split">Source on GitHub</a> · <a href="https://dev.reactive.network/">Reactive docs</a></span>
+    <span><a href="https://youtu.be/4tu7wUEud2c">Demo video (v2)</a> · <a href="https://github.com/andiPangeranm142/payday-split">Source on GitHub</a> · <a href="https://dev.reactive.network/">Reactive docs</a></span>
   </footer>
 </div>
 
@@ -454,7 +484,7 @@ import { ethers } from "ethers";
 
   function loadStats(){
     reactive.splitsRequested().then(function(n){ $("stat-splits").textContent = n.toString(); })
-      .catch(function(){ $("stat-splits").textContent = "3"; });
+      .catch(function(){ $("stat-splits").textContent = "4"; });
     lasna.getBalance(REACTIVE).then(function(b){ $("stat-reactive").textContent = parseFloat(ethers.formatEther(b)).toFixed(3) + " lREACT"; })
       .catch(function(){ $("stat-reactive").textContent = "—"; });
     base.getBalance(EXECUTOR).then(function(b){ $("stat-executor").textContent = parseFloat(ethers.formatEther(b)).toFixed(4); })

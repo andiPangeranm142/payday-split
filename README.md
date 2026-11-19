@@ -8,7 +8,7 @@ No keeper. No cron job. No off-chain bot. The automation lives entirely on-chain
 
 > **v2 (current, 19 Nov 2026): the stablecoin leg is now a REAL swap.** `UniswapSwapper` wraps the ETH and swaps it for Circle USDC through Uniswap V3 on Base Sepolia — the demo token is gone. The v1 contracts (mock swapper + pUSD) are still live and documented below, untouched.
 
-## v2: the loop with a real swap (verified live, three times)
+## v2: the loop with a real swap (verified live, four times)
 
 ```
 User deposits ETH ──► PaydayVault v2 (Base Sepolia) ──► DepositReceived event
@@ -62,9 +62,19 @@ Result: 0.0001 ETH locked in savings (lock #1), **1.327996 real USDC** credited,
 | Reactive `react()` | Lasna | [`0x0d409334…63f3`](https://lasna.reactscan.net/tx/0x0d40933441493a60cfdc629f2595f465b5be0adc892c5e07469a5ead813463f3) |
 | Callback split | Base Sepolia | [`0x7571eb4d…21c1`](https://sepolia.basescan.org/tx/0x7571eb4dd396ebb0aee1f30bb7a27d4df2b04d95fa2acaed6aa14b96eeef21c1) |
 
-Result: 0.00001 ETH locked in savings (lock #2), **2.124652 real USDC** credited, 0.00001 ETH spendable. Deposit block → callback block: **1 second**.
+Result: 0.00001 ETH locked in savings (lock #2), **2.124652 real USDC** credited, 0.00001 ETH spendable. Deposit block → callback block: **1 second**. This is the loop filmed in the [v2 demo video](https://youtu.be/4tu7wUEud2c).
 
-v2 totals so far: 0.0005 ETH deposited across 3 loops → 0.00017 ETH locked, **5.046334 USDC** out, 0.00014 ETH spendable. The vault holds exactly the USDC it credited (verified on-chain).
+**Loop v2-4** — custom rules (10% savings / 80% stable / 10% spendable), 0.0001 ETH:
+
+| Leg | Chain | Transaction |
+| --- | --- | --- |
+| Deposit | Base Sepolia | [`0x8058e54b…f369`](https://sepolia.basescan.org/tx/0x8058e54bf7cddfa2dcea8a76ad0ba77d99657211438a7287e1f9e8f098a5f369) |
+| Reactive `react()` | Lasna | [`0x2277ed74…28ba`](https://lasna.reactscan.net/tx/0x2277ed74db38f141ab5d3116ccab31dd99cf7ad4a010ecb3d728586d879f28ba) |
+| Callback split | Base Sepolia | [`0x057aa211…7e05`](https://sepolia.basescan.org/tx/0x057aa2118754163511135c3afbdfacd78be7fad4fe1b91bd66eb2a0600287e05) |
+
+Result: 0.00001 ETH locked in savings (lock #3), **2.160696 real USDC** credited, 0.00001 ETH spendable. Deposit 20 Nov 2026 02:22:00 WIB → callback 03:36:53 WIB: **74 minutes 53 seconds** — the callback was delayed by a network-wide Reactive relayer stall (no relayer callbacks anywhere 18:53–20:36 UTC, 19 Nov 2026; the relayer recovered and cleared the backlog). The split itself executed correctly once the callback landed; v2-1/2/3 each took 1 second.
+
+v2 totals so far: 0.0006 ETH deposited across 4 loops → 0.00018 ETH locked, **7.207030 USDC** out, 0.00015 ETH spendable. The vault holds exactly the USDC it credited (verified on-chain).
 
 ## v1: the loop (verified live, five times)
 
@@ -174,11 +184,11 @@ After both: `availableOf` 0.00044 → 0.00034 ETH, `stableOf` 0.8 → 0.6 pUSD, 
 
 - **Dust deposit (below minimum).** A 0.00005 ETH deposit — half the 0.0001 ETH `minDeposit` — was correctly ignored by the reactive contract: [`0x690e52c6…9b744`](https://sepolia.basescan.org/tx/0x690e52c633cceed94a9fe54918695cfb5b59cfae5042e48f4187035987d9b744) (Base Sepolia block 60779239). On Lasna it emitted `DepositSkipped` with reason `below-minimum`: [`0x66f7ea67…94444`](https://lasna.reactscan.net/tx/0x66f7ea679bd3ecdb7db5574b27f8890c87a0e375329cfe97e933dbe8ba694444) (Lasna block 8720620). `depositsSkipped` went 0 → 1, `splitsRequested` stayed 5, and the deposit remains safely spendable in the vault (never split, never lost). The exact boundary is also covered in tests (`testMinDepositBoundary`: `minDeposit - 1` skips, `minDeposit` processes).
 - **Rule extremes.** Loops 4–5 ran opposite rule sets (50/25/25 and 10/80/10); the fuzz suite (`testFuzzSplitAccounting`, 256 runs) proves spendable + locked + swapped == deposit for every deposit size and every valid rule combination, including 0/0 (all spendable) and 100% (nothing stays spendable).
-- **Pause safety.** A paused reactive contract skips deposits without marking them processed, so they can be retried after unpausing — proven in `testReactAfterUnpause`.
+- **Pause safety (with a caveat).** A paused reactive contract skips deposits without marking them processed — but v2 has no production path to reprocess them: the deposit event is not re-emitted and `react()` can only be called by the Reactive system contract, so a skipped deposit stays spendable in the vault but is never split. `testReactAfterUnpause` proves the skip logic via a manual call only.
 
 ## Reactive funding
 
-The reactive contracts are funded in lREACT for their `react()` calls and callback requests. **v2** (funded 0.08 lREACT at deploy, 19 Nov 2026): balance ~0.022 lREACT after 3 loops. **v1** (topped up 19 Nov 2026: +0.05 then +0.04 lREACT): balance ~0.024 lREACT after 7 loops + 1 dust skip. Outstanding debt is 0 on both reactive contracts and both callback executors — verified 19 Nov 2026 by calling `coverDebt()` on each (v2: [reactive](https://lasna.reactscan.net/tx/0xe8a7ac48f497e8fabf20b66535f5214abf364cee2685ce4e32c2be14c554da94), [executor](https://sepolia.basescan.org/tx/0x61219a1a0143d71d195f964dff7d1a9369c9ac18d66e115ae61232dc6f1ebce6); v1: [reactive](https://lasna.reactscan.net/tx/0x0534d25fc00d97f0211f31a2d119fe67de2574ddfcabbdabda57e8c59eeb7e4c), [executor](https://sepolia.basescan.org/tx/0x20bd725ae7437de76bbffb627a5f183be5d6e1500a0b5bd419c0ae8673944dde)): all balances were unchanged afterwards, proving no debt was outstanding.
+The reactive contracts are funded in lREACT for their `react()` calls and callback requests (~0.019 lREACT per loop). **v2** (funded 0.08 lREACT at deploy, 19 Nov 2026; topped up +0.09 lREACT on 20 Nov 2026): balance **0.0938632 lREACT as of 20 Nov 2026**, after 4 loops. **v1** (topped up 19 Nov 2026: +0.05 then +0.04 lREACT; +0.01 lREACT on 20 Nov 2026): balance **0.0339924 lREACT as of 20 Nov 2026**, after 7 loops + 1 dust skip. Outstanding debt is 0 on both reactive contracts and both callback executors — verified 19 Nov 2026 by calling `coverDebt()` on each (v2: [reactive](https://lasna.reactscan.net/tx/0xe8a7ac48f497e8fabf20b66535f5214abf364cee2685ce4e32c2be14c554da94), [executor](https://sepolia.basescan.org/tx/0x61219a1a0143d71d195f964dff7d1a9369c9ac18d66e115ae61232dc6f1ebce6); v1: [reactive](https://lasna.reactscan.net/tx/0x0534d25fc00d97f0211f31a2d119fe67de2574ddfcabbdabda57e8c59eeb7e4c), [executor](https://sepolia.basescan.org/tx/0x20bd725ae7437de76bbffb627a5f183be5d6e1500a0b5bd419c0ae8673944dde)): all balances were unchanged afterwards, proving no debt was outstanding.
 
 📊 **Live dashboard:** https://andipangeranm142.github.io/payday-split/ — rules, live balances, split history, and explorer links, read straight from the public RPCs.
 
@@ -213,8 +223,8 @@ Supporting infrastructure: Base Sepolia callback proxy `0x476F44b11F5C942c58f4c8
 - **The reactive contract does real work.** `PaydaySplit.react()` parses the deposit log, enforces a minimum-deposit policy and pause switch, deduplicates deposits, computes the split from the rules embedded in the event, and only then requests a callback. Remove it and nothing splits — there is no fallback path.
 - **Rules live in the event, not in a second source of truth.** The vault embeds the user's current rules in `DepositReceived`, so the reactive side is stateless w.r.t. rules and always applies exactly what the user set at deposit time.
 - **Callbacks are doubly authenticated.** `SplitExecutor` requires both `onlyServiceProvider` (caller is the Reactive callback proxy) and `onlyCallbackSender` (origin is our reactive contract). Nobody else can trigger a split.
-- **Money only moves through the split path or the user's own withdrawal.** The owner cannot touch user funds.
-- **Percentage splits can't underfund.** Each leg is a share of the deposited amount, so every leg always has exactly what it needs — there is no "insufficient balance" failure path the way a fixed-amount payout has. The reactive contract enforces a minimum deposit instead, so dust deposits never trigger a split.
+- **Money only moves through the split path or the user's own withdrawal.** The owner cannot withdraw user balances directly — but this is a single-owner (one EOA) testnet deployment, and the owner does control the parameters around the split: the executor address, the savings lock duration, the swapper price floor, and the callback gas limit. Those controls are documented in the code; a production deployment would put them behind a timelock or multisig.
+- **Percentage splits size every leg from the deposit.** Each leg is a share of the deposited amount, so a split never asks for more than was deposited. One honest caveat: the full deposit is spendable from the moment it lands, so a withdrawal in the ~1–2 second window before the callback can leave the vault short and revert the split — the funds stay safe and spendable, but v2 has no retry, so that deposit would never split (see Honest limitations).
 - **Withdrawals unlock after 30 days.** `SavingsVault.withdraw()` is covered by the Foundry suite, and a live withdrawal has been demonstrated on the byte-identical demo instance (1-hour lock, same codehash) — see Withdrawals above. No lock on the submitted vault itself has matured yet on testnet (earliest unlock 14 Dec 2026).
 
 ## Contracts
@@ -266,6 +276,7 @@ Deploy scripts live in `script/` (`DeployBase`, `DeployBaseV2`, `DeployReactive`
 - **v1's swap is a demo swapper.** `MockSwapper` converts ETH → pUSD at a fixed, owner-set rate (default 1 ETH = 2000 pUSD). It does not route through a DEX. **v2 fixes this**: `UniswapSwapper` swaps ETH → real Circle USDC through Uniswap V3. The v1 contracts stay live for the record.
 - **pUSD is a demo token** (v1 only) with no value; it exists so the v1 stablecoin leg produces a real, withdrawable balance.
 - **The testnet pool price is not the real ETH price.** The Base Sepolia WETH/USDC pool prices ETH at ~$26,500 — testnet pools are seeded arbitrarily. v2's USDC amounts reflect that pool price; the swap route itself is the production Uniswap path.
+- **No callback retry.** If a callback reverts — e.g. a withdrawal in the seconds before it lands leaves the vault short, or a swap slips past the floor — the deposit is already marked processed and v2 has no way to re-request the split. The funds stay safe and spendable in the vault, but the automation for that deposit is done. A retry path is the main thing a v3 would add.
 - **Lasna charges 100 gwei base fee**, so each `react()` costs ~0.02 lREACT. The reactive contracts are funded for a handful of demo loops; a production deployment funds them from a treasury or a small fee on splits.
 - **Testnet only.** Nothing here has touched mainnet or real funds.
 
