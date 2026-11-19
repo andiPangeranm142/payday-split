@@ -40,7 +40,7 @@ The swapper routes WETH → Circle USDC in the WETH/USDC 0.3% pool (the deepest 
 | Reactive `react()` | Lasna | [`0xef91c9b8…ad39`](https://lasna.reactscan.net/tx/0xef91c9b85ac4cb37c40f1dd702b1d6309128ef50c4fd1f5387445daad32ead39) |
 | Callback split | Base Sepolia | [`0x3367ff4b…ec38`](https://sepolia.basescan.org/tx/0x3367ff4b8ca8a6dd5e51fa19383614eb8b8ef90e8c2112d52d5ba5e19e81ec38) |
 
-Result: 0.00006 ETH locked in savings (lock #0), **1.593174 real USDC** credited, 0.00008 ETH spendable. Deposit block → callback block: **1 second**.
+Result: 0.00006 ETH locked in savings (lock #0), **1.593686 real USDC** credited, 0.00008 ETH spendable. Deposit block → callback block: **1 second**.
 
 **Loop v2-2** — custom rules (50% savings / 25% stable / 25% spendable), 0.0002 ETH:
 
@@ -51,7 +51,7 @@ Result: 0.00006 ETH locked in savings (lock #0), **1.593174 real USDC** credited
 | Reactive `react()` | Lasna | [`0xa12185ee…236f`](https://lasna.reactscan.net/tx/0xa12185eee005c28ac69a60c38afade04cad702e94727144091ac454adf08236f) |
 | Callback split | Base Sepolia | [`0x81b8296e…fd4c`](https://sepolia.basescan.org/tx/0x81b8296eec0144b02224a00920c7a1b29a8be45d1f1a4459b1649d209f29fd4c) |
 
-Result: 0.0001 ETH locked in savings (lock #1), **1.326204 real USDC** credited, 0.00005 ETH spendable. Deposit block → callback block: **1 second**.
+Result: 0.0001 ETH locked in savings (lock #1), **1.327996 real USDC** credited, 0.00005 ETH spendable. Deposit block → callback block: **1 second**.
 
 **Loop v2-3** — custom rules (10% savings / 80% stable / 10% spendable), 0.0001 ETH:
 
@@ -62,9 +62,9 @@ Result: 0.0001 ETH locked in savings (lock #1), **1.326204 real USDC** credited,
 | Reactive `react()` | Lasna | [`0x0d409334…63f3`](https://lasna.reactscan.net/tx/0x0d40933441493a60cfdc629f2595f465b5be0adc892c5e07469a5ead813463f3) |
 | Callback split | Base Sepolia | [`0x7571eb4d…21c1`](https://sepolia.basescan.org/tx/0x7571eb4dd396ebb0aee1f30bb7a27d4df2b04d95fa2acaed6aa14b96eeef21c1) |
 
-Result: 0.00001 ETH locked in savings (lock #2), **2.127468 real USDC** credited, 0.00001 ETH spendable. Deposit block → callback block: **1 second**.
+Result: 0.00001 ETH locked in savings (lock #2), **2.124652 real USDC** credited, 0.00001 ETH spendable. Deposit block → callback block: **1 second**.
 
-v2 totals so far: 0.0005 ETH deposited across 3 loops → 0.00017 ETH locked, **5.046846 USDC** out, 0.00014 ETH spendable. The vault holds exactly the USDC it credited (verified on-chain).
+v2 totals so far: 0.0005 ETH deposited across 3 loops → 0.00017 ETH locked, **5.046334 USDC** out, 0.00014 ETH spendable. The vault holds exactly the USDC it credited (verified on-chain).
 
 ## v1: the loop (verified live, five times)
 
