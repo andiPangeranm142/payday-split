@@ -91,7 +91,9 @@ Both withdrawal paths have been executed on-chain by the demo wallet — the mon
 | Spendable ETH — `withdraw(0.0001 ETH)` (Base Sepolia block 60779172) | [`0xafefa653…4c16d`](https://sepolia.basescan.org/tx/0xafefa6537897bccdc46db4135f1a33125324fdc8ff2b01464d4d6b8691c4c16d) |
 | Stablecoin — `withdrawStable(0.2 pUSD)` (Base Sepolia block 60779179) | [`0x4004d224…bb28a`](https://sepolia.basescan.org/tx/0x4004d224e62f34e39d1de28401fa738b5358eaf0ad1d3d6a8bf78267a09bb28a) |
 
-After both: `availableOf` 0.00044 → 0.00034 ETH, `stableOf` 0.8 → 0.6 pUSD, and the wallet holds 0.2 pUSD directly. Savings-lock withdrawal is covered by the Foundry suite; a live demonstration on a byte-identical demo instance (1-hour lock, same codehash as the submitted vault) is in progress — its lock #0 unlocks 19 Nov 2026 16:23 WIB. The submitted vault's locks mature 14 Dec 2026.
+| Savings lock — `withdraw(0)` on demo SavingsVault `0x51b0D9e3…1048` (Base Sepolia block 60792604) | [`0xa84e80b3…1aa9`](https://sepolia.basescan.org/tx/0xa84e80b3759175c61c1b073b0def98914d511b15ef424956a0c034268c1d1aa9) |
+
+After both: `availableOf` 0.00044 → 0.00034 ETH, `stableOf` 0.8 → 0.6 pUSD, and the wallet holds 0.2 pUSD directly. Savings-lock withdrawal is covered by the Foundry suite — and it has now also been shown live: on 19 Nov 2026 the demo SavingsVault instance `0x51b0D9e32345B4157D3BD34d18C22dCD2c241048` (bytecode-identical to the submitted vault, same codehash `0x532cd1b4…`) released its 1-hour lock #0 (0.0002 ETH, unlocked 16:23 WIB) via [`0xa84e80b3…1aa9`](https://sepolia.basescan.org/tx/0xa84e80b3759175c61c1b073b0def98914d511b15ef424956a0c034268c1d1aa9) (Base Sepolia block 60792604, status success; lock #0 now `withdrawn == true`, deployer balance +0.0002 ETH minus gas). The submitted vault itself still uses the 30-day lock, and its first lock only matures 14 Dec 2026.
 
 ## Edge cases (verified live)
 
@@ -125,7 +127,7 @@ Supporting infrastructure: Base Sepolia callback proxy `0x476F44b11F5C942c58f4c8
 - **Callbacks are doubly authenticated.** `SplitExecutor` requires both `onlyServiceProvider` (caller is the Reactive callback proxy) and `onlyCallbackSender` (origin is our reactive contract). Nobody else can trigger a split.
 - **Money only moves through the split path or the user's own withdrawal.** The owner cannot touch user funds.
 - **Percentage splits can't underfund.** Each leg is a share of the deposited amount, so every leg always has exactly what it needs — there is no "insufficient balance" failure path the way a fixed-amount payout has. The reactive contract enforces a minimum deposit instead, so dust deposits never trigger a split.
-- **Withdrawals unlock after 30 days.** `SavingsVault.withdraw()` is covered by the Foundry suite; no lock has matured yet on testnet (earliest unlock 14 Dec 2026), so a live withdrawal can't be shown until then.
+- **Withdrawals unlock after 30 days.** `SavingsVault.withdraw()` is covered by the Foundry suite, and a live withdrawal has been demonstrated on the byte-identical demo instance (1-hour lock, same codehash) — see Withdrawals above. No lock on the submitted vault itself has matured yet on testnet (earliest unlock 14 Dec 2026).
 
 ## Contracts
 
