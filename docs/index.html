@@ -274,7 +274,7 @@
   </div>
 
   <h2 class="section">Verified <span class="grad">full loops</span></h2>
-  <p class="section-sub">Three complete deposit → react → callback runs, every leg linked to its explorer.</p>
+  <p class="section-sub">Five complete deposit → react → callback runs, every leg linked to its explorer.</p>
   <div class="card" style="padding:8px 10px">
     <table>
       <thead><tr><th>Loop</th><th>Deposit</th><th>Reactive</th><th>Callback split</th><th>Result</th></tr></thead>
@@ -300,11 +300,25 @@
           <td><span class="pill base">Base Sepolia</span><br><a class="mono" href="https://sepolia.basescan.org/tx/0x0c7c436d0a2b8f46f5c9fb086903a9e8c948880ae1ece947bec834ac60ac951d">0x0c7c436d…c951d</a></td>
           <td><span class="pill ok">Verified</span><br><span class="sub">0.00005 ETH locked · 0.04 pUSD · 0.00003 ETH spendable · ~2s</span></td>
         </tr>
+        <tr>
+          <td><b>4</b><br><span class="sub">0.0002 ETH · custom 50/25/25</span></td>
+          <td><span class="pill base">Base Sepolia</span><br><a class="mono" href="https://sepolia.basescan.org/tx/0x6955ff465153da1a6f050a98433bfa831c67143147b4797c48c8c31f992f48d0">0x6955ff46…f48d0</a></td>
+          <td><span class="pill lasna">Lasna</span><br><a class="mono" href="https://lasna.reactscan.net/tx/0x1021cd7b410d1bfda01abd5a95844bd2a96d1807b02fbc172669e1aa32656184">0x1021cd7b…56184</a></td>
+          <td><span class="pill base">Base Sepolia</span><br><a class="mono" href="https://sepolia.basescan.org/tx/0xf599a824fc02b5d629b94a546f2177855a59d5911153b0b18508596dfa15c51d">0xf599a824…c51d</a></td>
+          <td><span class="pill ok">Verified</span><br><span class="sub">0.0001 ETH locked · 0.1 pUSD · 0.00005 ETH spendable · ~2s</span></td>
+        </tr>
+        <tr>
+          <td><b>5</b><br><span class="sub">0.0001 ETH · custom 10/80/10</span></td>
+          <td><span class="pill base">Base Sepolia</span><br><a class="mono" href="https://sepolia.basescan.org/tx/0x58c5641349e57c62f72968709eaa1ea63f0571e17730cee4e696f4381511ff7a">0x58c56413…1ff7a</a></td>
+          <td><span class="pill lasna">Lasna</span><br><a class="mono" href="https://lasna.reactscan.net/tx/0xdc2fdb0e6c14b2f9d05c5a8b6d66bda8775f858245f834aad30ee08fde6db0f1">0xdc2fdb0e…b0f1</a></td>
+          <td><span class="pill base">Base Sepolia</span><br><a class="mono" href="https://sepolia.basescan.org/tx/0x3f3213ae8ab3c1d3fe044c49e5399759a1639a90f9786a4158a1f00f8b1c0db0">0x3f3213ae…c0db0</a></td>
+          <td><span class="pill ok">Verified</span><br><span class="sub">0.00001 ETH locked · 0.16 pUSD · 0.00001 ETH spendable · ~1s</span></td>
+        </tr>
       </tbody>
     </table>
   </div>
   <details class="card" style="padding:12px 16px;margin-top:10px">
-    <summary style="cursor:pointer"><b>Full transaction hashes</b> <span class="sub">— every leg, all three loops</span></summary>
+    <summary style="cursor:pointer"><b>Full transaction hashes</b> <span class="sub">— every leg, all five loops</span></summary>
     <div style="margin-top:10px;font-size:13px;line-height:1.9">
       <b>Loop 1</b> — deposit <a class="mono" href="https://sepolia.basescan.org/tx/0xa14ec0b9c0d93a24cc7735b17646d92ee240ff7c216d8c920f377b5fb90f7400" style="word-break:break-all">0xa14ec0b9c0d93a24cc7735b17646d92ee240ff7c216d8c920f377b5fb90f7400</a><br>
       <span style="margin-left:52px">reactive <a class="mono" href="https://lasna.reactscan.net/tx/0x0487d4312546a879d8077b24857e04c371fe302b3d49d6ede78621b52113c94c" style="word-break:break-all">0x0487d4312546a879d8077b24857e04c371fe302b3d49d6ede78621b52113c94c</a><br></span>
@@ -314,7 +328,13 @@
       <span style="margin-left:52px">callback <a class="mono" href="https://sepolia.basescan.org/tx/0xfbaf3ca2710087b7e0aafbcff00fc47df8b343f299cd1583d9f477f01db12a88" style="word-break:break-all">0xfbaf3ca2710087b7e0aafbcff00fc47df8b343f299cd1583d9f477f01db12a88</a></span><br>
       <b>Loop 3</b> — deposit <a class="mono" href="https://sepolia.basescan.org/tx/0x66775dfc09b7e8a26f4e73a90688814d3ca276e8869d4c6bbd1aff303b802368" style="word-break:break-all">0x66775dfc09b7e8a26f4e73a90688814d3ca276e8869d4c6bbd1aff303b802368</a><br>
       <span style="margin-left:52px">reactive <a class="mono" href="https://lasna.reactscan.net/tx/0x48d578197932182723df51ff9e60fe26c59cf30ecdec5fd3c280c6d6aed3b375" style="word-break:break-all">0x48d578197932182723df51ff9e60fe26c59cf30ecdec5fd3c280c6d6aed3b375</a><br></span>
-      <span style="margin-left:52px">callback <a class="mono" href="https://sepolia.basescan.org/tx/0x0c7c436d0a2b8f46f5c9fb086903a9e8c948880ae1ece947bec834ac60ac951d" style="word-break:break-all">0x0c7c436d0a2b8f46f5c9fb086903a9e8c948880ae1ece947bec834ac60ac951d</a></span>
+      <span style="margin-left:52px">callback <a class="mono" href="https://sepolia.basescan.org/tx/0x0c7c436d0a2b8f46f5c9fb086903a9e8c948880ae1ece947bec834ac60ac951d" style="word-break:break-all">0x0c7c436d0a2b8f46f5c9fb086903a9e8c948880ae1ece947bec834ac60ac951d</a></span><br>
+      <b>Loop 4</b> — deposit <a class="mono" href="https://sepolia.basescan.org/tx/0x6955ff465153da1a6f050a98433bfa831c67143147b4797c48c8c31f992f48d0" style="word-break:break-all">0x6955ff465153da1a6f050a98433bfa831c67143147b4797c48c8c31f992f48d0</a><br>
+      <span style="margin-left:52px">reactive <a class="mono" href="https://lasna.reactscan.net/tx/0x1021cd7b410d1bfda01abd5a95844bd2a96d1807b02fbc172669e1aa32656184" style="word-break:break-all">0x1021cd7b410d1bfda01abd5a95844bd2a96d1807b02fbc172669e1aa32656184</a><br></span>
+      <span style="margin-left:52px">callback <a class="mono" href="https://sepolia.basescan.org/tx/0xf599a824fc02b5d629b94a546f2177855a59d5911153b0b18508596dfa15c51d" style="word-break:break-all">0xf599a824fc02b5d629b94a546f2177855a59d5911153b0b18508596dfa15c51d</a></span><br>
+      <b>Loop 5</b> — deposit <a class="mono" href="https://sepolia.basescan.org/tx/0x58c5641349e57c62f72968709eaa1ea63f0571e17730cee4e696f4381511ff7a" style="word-break:break-all">0x58c5641349e57c62f72968709eaa1ea63f0571e17730cee4e696f4381511ff7a</a><br>
+      <span style="margin-left:52px">reactive <a class="mono" href="https://lasna.reactscan.net/tx/0xdc2fdb0e6c14b2f9d05c5a8b6d66bda8775f858245f834aad30ee08fde6db0f1" style="word-break:break-all">0xdc2fdb0e6c14b2f9d05c5a8b6d66bda8775f858245f834aad30ee08fde6db0f1</a><br></span>
+      <span style="margin-left:52px">callback <a class="mono" href="https://sepolia.basescan.org/tx/0x3f3213ae8ab3c1d3fe044c49e5399759a1639a90f9786a4158a1f00f8b1c0db0" style="word-break:break-all">0x3f3213ae8ab3c1d3fe044c49e5399759a1639a90f9786a4158a1f00f8b1c0db0</a></span>
     </div>
   </details>
 

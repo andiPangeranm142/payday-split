@@ -6,7 +6,7 @@ Payday Split is a "set it and forget it" automation built on [Reactive Network](
 
 No keeper. No cron job. No off-chain bot. The automation lives entirely on-chain.
 
-## The loop (verified live, three times)
+## The loop (verified live, five times)
 
 ```
 User deposits ETH ──► PaydayVault (Base Sepolia) ──► DepositReceived event
@@ -57,6 +57,30 @@ Result: 0.00025 ETH locked in savings (lock #1), 0.2 pUSD credited, 0.00015 ETH 
 | Callback split | Base Sepolia | [`0x0c7c436d…c951d`](https://sepolia.basescan.org/tx/0x0c7c436d0a2b8f46f5c9fb086903a9e8c948880ae1ece947bec834ac60ac951d) |
 
 Result: 0.00005 ETH locked in savings (lock #2), 0.04 pUSD credited, 0.00003 ETH spendable. Deposit block → callback block: **2 seconds**. This is the loop filmed in the [demo video](https://www.youtube.com/watch?v=6j7lKUyHwgo).
+
+**Loop 4** — custom rules (50% savings / 25% stable / 25% spendable), 0.0002 ETH — larger deposit, different rules:
+
+| Leg | Chain | Transaction |
+| --- | --- | --- |
+| `setRules(5000, 2500)` | Base Sepolia | [`0xca0af53a…c224`](https://sepolia.basescan.org/tx/0xca0af53a6f7a297356c1902db328b070c7893d5a1f42a94a8643fdfbb665c224) |
+| Deposit | Base Sepolia | [`0x6955ff46…f48d0`](https://sepolia.basescan.org/tx/0x6955ff465153da1a6f050a98433bfa831c67143147b4797c48c8c31f992f48d0) |
+| Reactive `react()` | Lasna | [`0x1021cd7b…56184`](https://lasna.reactscan.net/tx/0x1021cd7b410d1bfda01abd5a95844bd2a96d1807b02fbc172669e1aa32656184) |
+| Callback split | Base Sepolia | [`0xf599a824…c51d`](https://sepolia.basescan.org/tx/0xf599a824fc02b5d629b94a546f2177855a59d5911153b0b18508596dfa15c51d) |
+
+Result: 0.0001 ETH locked in savings (lock #3), 0.1 pUSD credited, 0.00005 ETH spendable. Deposit block → callback block: **2 seconds**.
+
+**Loop 5** — custom rules (10% savings / 80% stable / 10% spendable), 0.0001 ETH — heavy stable allocation, the opposite extreme:
+
+| Leg | Chain | Transaction |
+| --- | --- | --- |
+| `setRules(1000, 8000)` | Base Sepolia | [`0xcb9a640a…fc18`](https://sepolia.basescan.org/tx/0xcb9a640aa288bdd3921ea7294c56f90b9293384d2382cd2016c6df8e0dd2fc18) |
+| Deposit | Base Sepolia | [`0x58c56413…1ff7a`](https://sepolia.basescan.org/tx/0x58c5641349e57c62f72968709eaa1ea63f0571e17730cee4e696f4381511ff7a) |
+| Reactive `react()` | Lasna | [`0xdc2fdb0e…b0f1`](https://lasna.reactscan.net/tx/0xdc2fdb0e6c14b2f9d05c5a8b6d66bda8775f858245f834aad30ee08fde6db0f1) |
+| Callback split | Base Sepolia | [`0x3f3213ae…c0db0`](https://sepolia.basescan.org/tx/0x3f3213ae8ab3c1d3fe044c49e5399759a1639a90f9786a4158a1f00f8b1c0db0) |
+
+Result: 0.00001 ETH locked in savings (lock #4), 0.16 pUSD credited, 0.00001 ETH spendable. Deposit block → callback block: **1 second**.
+
+Across all five loops: **5 deposits processed, 0 skipped** (`depositsSkipped == 0` on-chain), 5 savings locks created, 0.8 pUSD credited in total — with four different rule sets (default 30/30/40, 50/20/30, 50/25/25, 10/80/10), proving the split follows whatever rules the user set at deposit time.
 
 📊 **Live dashboard:** https://andipangeranm142.github.io/payday-split/ — rules, live balances, split history, and explorer links, read straight from the public RPCs.
 
@@ -119,7 +143,7 @@ Watch the loop live: the deposit emits `DepositReceived`, `PaydaySplit` on Lasna
 
 ```bash
 forge build
-forge test        # 32 tests, 5 suites — vault, swapper, savings, reactive, executor
+forge test        # 55 tests, 10 suites — vault, swapper, savings, reactive, executor, plus edge-case + fuzz suites
 ```
 
 Deploy scripts live in `script/` (`DeployBase`, `DeployReactive`, `DeployExecutor`). Deploy order matters: Base contracts → reactive contract (needs the vault address) → executor (needs the reactive address) → wire executor on both sides → fund both (reactive in lREACT, executor in Base Sepolia ETH).
