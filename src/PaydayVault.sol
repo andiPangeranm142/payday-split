@@ -2,7 +2,7 @@
 pragma solidity ^0.8.29;
 
 import { ISwapper } from "./MockSwapper.sol";
-import { PaydayUSD } from "./PaydayUSD.sol";
+import { IERC20 } from "./IERC20.sol";
 import { SavingsVault } from "./SavingsVault.sol";
 
 /// @title PaydayVault — the origin contract of the Payday Split loop.
@@ -11,7 +11,7 @@ import { SavingsVault } from "./SavingsVault.sol";
 ///         reactive contract sees the deposit it requests a callback, and the
 ///         callback (via SplitExecutor) calls `executeSplit` here to move the
 ///         money: savings -> SavingsVault (timelocked), stable slice -> swapper
-///         (pUSD credited to the user), remainder stays as spendable balance.
+///         (stablecoin credited to the user), remainder stays as spendable balance.
 ///         Nobody — not even the owner — can move a user's funds except through
 ///         this split path or the user's own withdrawal.
 contract PaydayVault {
@@ -63,7 +63,7 @@ contract PaydayVault {
     address public executor; // SplitExecutor — the only caller of executeSplit.
 
     ISwapper public immutable swapper;
-    PaydayUSD public immutable stable;
+    IERC20 public immutable stable;
     SavingsVault public immutable savingsVault;
 
     uint256 public nextDepositId;
@@ -71,9 +71,9 @@ contract PaydayVault {
     mapping(address => Rules) public rulesOf;
     mapping(address => bool) public rulesSet;
     mapping(address => uint256) public availableOf; // spendable ETH balance
-    mapping(address => uint256) public stableOf; // pUSD balance held for user
+    mapping(address => uint256) public stableOf; // stablecoin balance held for user
 
-    constructor(ISwapper swapper_, PaydayUSD stable_, SavingsVault savingsVault_) {
+    constructor(ISwapper swapper_, IERC20 stable_, SavingsVault savingsVault_) {
         owner = msg.sender;
         swapper = swapper_;
         stable = stable_;
@@ -155,11 +155,11 @@ contract PaydayVault {
         emit Withdrawn(msg.sender, amount_);
     }
 
-    /// @notice Withdraw credited pUSD.
+    /// @notice Withdraw credited stablecoin.
     function withdrawStable(uint256 amount_) external {
         if (amount_ > stableOf[msg.sender]) revert InsufficientBalance();
         stableOf[msg.sender] -= amount_;
-        require(stable.transfer(msg.sender, amount_), "pUSD transfer failed");
+        require(stable.transfer(msg.sender, amount_), "stable transfer failed");
         emit StableWithdrawn(msg.sender, amount_);
     }
 }

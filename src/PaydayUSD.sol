@@ -1,17 +1,19 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.29;
 
+import { IERC20 } from "./IERC20.sol";
+
 /// @title Payday USD — demo stablecoin for the Payday Split testnet demo.
 /// @notice A minimal ERC-20 with a single minter (the swapper). Testnet only,
 ///         no economic value. Exists so the "swap to stablecoin" leg of a split
 ///         produces a real token balance a user can see and withdraw.
-contract PaydayUSD {
+contract PaydayUSD is IERC20 {
     string public constant name = "Payday USD";
     string public constant symbol = "pUSD";
     uint8 public constant decimals = 18;
 
     uint256 public totalSupply;
-    mapping(address => uint256) public balanceOf;
+    mapping(address => uint256) public override balanceOf;
     mapping(address => mapping(address => uint256)) public allowance;
 
     address public immutable minter;
@@ -34,12 +36,12 @@ contract PaydayUSD {
         emit Transfer(address(0), to_, amount_);
     }
 
-    function transfer(address to_, uint256 amount_) external returns (bool) {
+    function transfer(address to_, uint256 amount_) external override returns (bool) {
         _transfer(msg.sender, to_, amount_);
         return true;
     }
 
-    function approve(address spender_, uint256 amount_) external returns (bool) {
+    function approve(address spender_, uint256 amount_) external override returns (bool) {
         allowance[msg.sender][spender_] = amount_;
         emit Approval(msg.sender, spender_, amount_);
         return true;
