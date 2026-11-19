@@ -82,6 +82,21 @@ Result: 0.00001 ETH locked in savings (lock #4), 0.16 pUSD credited, 0.00001 ETH
 
 Across all five loops: **5 deposits processed, 1 correctly skipped** (a below-minimum deposit, see Edge cases below — `depositsSkipped == 1` on-chain, by design), 5 savings locks created, 0.8 pUSD credited in total — with four different rule sets (default 30/30/40, 50/20/30, 50/25/25, 10/80/10), proving the split follows whatever rules the user set at deposit time.
 
+## Second user (verified live)
+
+The system is multi-user: a second wallet (`0x9e63DCbeF0d0DFA1e1D6E6b7EB320DdC48D10200`) used the same live contracts with its own rules, no deployer involvement in the split:
+
+| Step | Transaction |
+| --- | --- |
+| Deposit #1 — 0.0001 ETH, default 30/30/40 (Base Sepolia block 60802118) | [`0x8987f5ee…ac92`](https://sepolia.basescan.org/tx/0x8987f5eec4b0f4dfac6734fdca7b3b930f66c4ada382c85de12a328ae45dac92) |
+| Reactive (Lasna block 8724914) | [`0xc4001797…c9b8`](https://lasna.reactscan.net/tx/0xc40017973d4d72908cc3002f345a92170483d3d326effeab32a886d8db49c9b8) |
+| Callback (block 60802123, ~1s) | [`0xdc4d664f…c595`](https://sepolia.basescan.org/tx/0xdc4d664f831a719f20f64d42fea722e903f4be8c03213d4523cf59a884f7c595) |
+| Deposit #2 — 0.0001 ETH, own rules 40/40/20 (block 60802315) | [`0x02906672…f424`](https://sepolia.basescan.org/tx/0x02906672e944983b9139cb9a1b8cb6f855b263484efd198315fd252ccb28f424) |
+| Reactive (Lasna block 8724952) | [`0x3c5dbfcc…e9c4`](https://lasna.reactscan.net/tx/0x3c5dbfcc10526d04b505e840478ebeed79f2425e7a16671ec601e1f8340de9c4) |
+| Callback (block 60802323, ~2s) | [`0x4903d13a…a3d8`](https://sepolia.basescan.org/tx/0x4903d13a1ad699378d4b47db1910cbf95830ed1a6523e1ee3a7a5bc40301a3d8) |
+
+Result for the second wallet: 2 locks (0.00003 + 0.00004 ETH), 0.14 pUSD, 0.00006 ETH spendable — `splitsRequested` 5 → 7, each user's balances tracked separately.
+
 ## Withdrawals (verified live)
 
 Both withdrawal paths have been executed on-chain by the demo wallet — the money actually comes back out:
