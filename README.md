@@ -6,7 +6,67 @@ Payday Split is a "set it and forget it" automation built on [Reactive Network](
 
 No keeper. No cron job. No off-chain bot. The automation lives entirely on-chain.
 
-## The loop (verified live, five times)
+> **v2 (current, 19 Nov 2026): the stablecoin leg is now a REAL swap.** `UniswapSwapper` wraps the ETH and swaps it for Circle USDC through Uniswap V3 on Base Sepolia — the demo token is gone. The v1 contracts (mock swapper + pUSD) are still live and documented below, untouched.
+
+## v2: the loop with a real swap (verified live, three times)
+
+```
+User deposits ETH ──► PaydayVault v2 (Base Sepolia) ──► DepositReceived event
+                                                          │
+                                            Reactive Network observes it
+                                                          ▼
+                                              PaydaySplit v2 (Lasna)
+                                         parses rules, computes split,
+                                            requests callback
+                                                          │
+                                                          ▼
+                                     SplitExecutor v2 (Base Sepolia, via
+                                     Reactive callback proxy)
+                                                          │
+                              ┌───────────────┬───────────┴───────────┐
+                              ▼               ▼                       ▼
+                      SavingsVault    UniswapSwapper → USDC   stays spendable
+                      (30-day lock)   (real V3 swap, credited  in PaydayVault
+                                       to user)              v2
+```
+
+The swapper routes WETH → Circle USDC in the WETH/USDC 0.3% pool (the deepest on Base Sepolia) via the official SwapRouter02. Slippage is protected two ways: a $10,000/ETH price floor, and a QuoterV2 quote tightened to 97% (3% max slippage) — if the quoter ever fails, the swap still proceeds under the floor instead of bricking the split. Note: the Base Sepolia pool prices ETH at ~$26,500 — testnet pools are seeded arbitrarily, so the USDC amounts below reflect the testnet price, not mainnet ETH. The route, the quoter and the protection are all real.
+
+**Loop v2-1** — default rules (30% savings / 30% stable / 40% spendable), 0.0002 ETH:
+
+| Leg | Chain | Transaction |
+| --- | --- | --- |
+| Deposit | Base Sepolia | [`0x23ee6e0b…dc0c`](https://sepolia.basescan.org/tx/0x23ee6e0b00ff24c8d48dd1b50341af213ccfe4a30328411b35f3fcc3ac5edc0c) |
+| Reactive `react()` | Lasna | [`0xef91c9b8…ad39`](https://lasna.reactscan.net/tx/0xef91c9b85ac4cb37c40f1dd702b1d6309128ef50c4fd1f5387445daad32ead39) |
+| Callback split | Base Sepolia | [`0x3367ff4b…ec38`](https://sepolia.basescan.org/tx/0x3367ff4b8ca8a6dd5e51fa19383614eb8b8ef90e8c2112d52d5ba5e19e81ec38) |
+
+Result: 0.00006 ETH locked in savings (lock #0), **1.593174 real USDC** credited, 0.00008 ETH spendable. Deposit block → callback block: **1 second**.
+
+**Loop v2-2** — custom rules (50% savings / 25% stable / 25% spendable), 0.0002 ETH:
+
+| Leg | Chain | Transaction |
+| --- | --- | --- |
+| `setRules(5000, 2500)` | Base Sepolia | [`0x98edee53…a8d7`](https://sepolia.basescan.org/tx/0x98edee53b45a9679e2669b74aba1623028ce7aa621be9562ee70602eb3e5a8d7) |
+| Deposit | Base Sepolia | [`0xeeba5b5a…837f`](https://sepolia.basescan.org/tx/0xeeba5b5a9d3f1a29a87475c42ff065e786ba6eb2484652269817d3957029837f) |
+| Reactive `react()` | Lasna | [`0xa12185ee…236f`](https://lasna.reactscan.net/tx/0xa12185eee005c28ac69a60c38afade04cad702e94727144091ac454adf08236f) |
+| Callback split | Base Sepolia | [`0x81b8296e…fd4c`](https://sepolia.basescan.org/tx/0x81b8296eec0144b02224a00920c7a1b29a8be45d1f1a4459b1649d209f29fd4c) |
+
+Result: 0.0001 ETH locked in savings (lock #1), **1.326204 real USDC** credited, 0.00005 ETH spendable. Deposit block → callback block: **1 second**.
+
+**Loop v2-3** — custom rules (10% savings / 80% stable / 10% spendable), 0.0001 ETH:
+
+| Leg | Chain | Transaction |
+| --- | --- | --- |
+| `setRules(1000, 8000)` | Base Sepolia | [`0xf2c33126…1f60`](https://sepolia.basescan.org/tx/0xf2c33126573c1b9a24a0000cec9d42e4180209440f8f001a6235072ca3f11f60) |
+| Deposit | Base Sepolia | [`0x004a75f4…27ecb`](https://sepolia.basescan.org/tx/0x004a75f488790c3907a83a0e6645b4799f2f0465b8418224d7a262af95227ecb) |
+| Reactive `react()` | Lasna | [`0x0d409334…63f3`](https://lasna.reactscan.net/tx/0x0d40933441493a60cfdc629f2595f465b5be0adc892c5e07469a5ead813463f3) |
+| Callback split | Base Sepolia | [`0x7571eb4d…21c1`](https://sepolia.basescan.org/tx/0x7571eb4dd396ebb0aee1f30bb7a27d4df2b04d95fa2acaed6aa14b96eeef21c1) |
+
+Result: 0.00001 ETH locked in savings (lock #2), **2.127468 real USDC** credited, 0.00001 ETH spendable. Deposit block → callback block: **1 second**.
+
+v2 totals so far: 0.0005 ETH deposited across 3 loops → 0.00017 ETH locked, **5.046846 USDC** out, 0.00014 ETH spendable. The vault holds exactly the USDC it credited (verified on-chain).
+
+## v1: the loop (verified live, five times)
 
 ```
 User deposits ETH ──► PaydayVault (Base Sepolia) ──► DepositReceived event
@@ -118,11 +178,24 @@ After both: `availableOf` 0.00044 → 0.00034 ETH, `stableOf` 0.8 → 0.6 pUSD, 
 
 ## Reactive funding
 
-The reactive contract is funded in lREACT for its `react()` calls and callback requests (topped up 19 Nov 2026: +0.05 then +0.04 lREACT; balance ~0.061 lREACT, enough for several more loops). Outstanding debt is 0 on both the reactive contract and the callback executor — verified 19 Nov 2026 by calling `coverDebt()` on each ([reactive](https://lasna.reactscan.net/tx/0x0534d25fc00d97f0211f31a2d119fe67de2574ddfcabbdabda57e8c59eeb7e4c), [executor](https://sepolia.basescan.org/tx/0x20bd725ae7437de76bbffb627a5f183be5d6e1500a0b5bd419c0ae8673944dde)): both balances were unchanged afterwards, proving no debt was outstanding.
+The reactive contracts are funded in lREACT for their `react()` calls and callback requests. **v2** (funded 0.08 lREACT at deploy, 19 Nov 2026): balance ~0.022 lREACT after 3 loops. **v1** (topped up 19 Nov 2026: +0.05 then +0.04 lREACT): balance ~0.024 lREACT after 7 loops + 1 dust skip. Outstanding debt is 0 on both reactive contracts and both callback executors — verified 19 Nov 2026 by calling `coverDebt()` on each (v2: [reactive](https://lasna.reactscan.net/tx/0xe8a7ac48f497e8fabf20b66535f5214abf364cee2685ce4e32c2be14c554da94), [executor](https://sepolia.basescan.org/tx/0x61219a1a0143d71d195f964dff7d1a9369c9ac18d66e115ae61232dc6f1ebce6); v1: [reactive](https://lasna.reactscan.net/tx/0x0534d25fc00d97f0211f31a2d119fe67de2574ddfcabbdabda57e8c59eeb7e4c), [executor](https://sepolia.basescan.org/tx/0x20bd725ae7437de76bbffb627a5f183be5d6e1500a0b5bd419c0ae8673944dde)): all balances were unchanged afterwards, proving no debt was outstanding.
 
 📊 **Live dashboard:** https://andipangeranm142.github.io/payday-split/ — rules, live balances, split history, and explorer links, read straight from the public RPCs.
 
 ## Deployed contracts (all Sourcify-verified)
+
+### v2 (current — real Uniswap swap)
+
+| Contract | Chain | Address |
+| --- | --- | --- |
+| `PaydaySplit` (reactive) | Reactive Lasna (5318007) | [`0x973112e077258b0b16a0a20ca237270a8ea6f993`](https://lasna.reactscan.net/address/0x973112e077258b0b16a0a20ca237270a8ea6f993) |
+| `PaydayVault` (origin) | Base Sepolia (84532) | [`0x5321c59cfed976f5e3cabb11a9d899593b629e90`](https://sepolia.basescan.org/address/0x5321c59cfed976f5e3cabb11a9d899593b629e90) |
+| `SplitExecutor` (callback) | Base Sepolia (84532) | [`0xf654ecc5fbc173e1b7fbf46f870fe549e96d4778`](https://sepolia.basescan.org/address/0xf654ecc5fbc173e1b7fbf46f870fe549e96d4778) |
+| `SavingsVault` | Base Sepolia (84532) | [`0x8c17429da93e1545e516216869c0913ac1823303`](https://sepolia.basescan.org/address/0x8c17429da93e1545e516216869c0913ac1823303) |
+| `UniswapSwapper` | Base Sepolia (84532) | [`0x379a5a89f007d93ecf70777713cf036690405716`](https://sepolia.basescan.org/address/0x379a5a89f007d93ecf70777713cf036690405716) |
+| USDC (Circle) | Base Sepolia (84532) | [`0x036CbD53842c5426634e7929541eC2318f3dCF7e`](https://sepolia.basescan.org/address/0x036CbD53842c5426634e7929541eC2318f3dCF7e) |
+
+### v1 (mock swapper + pUSD — still live, untouched)
 
 | Contract | Chain | Address |
 | --- | --- | --- |
@@ -149,18 +222,20 @@ Supporting infrastructure: Base Sepolia callback proxy `0x476F44b11F5C942c58f4c8
 | File | Role |
 | --- | --- |
 | `src/PaydaySplit.sol` | Reactive contract on Lasna. Subscribes to `DepositReceived` on Base Sepolia; computes splits; requests callbacks. |
-| `src/PaydayVault.sol` | Origin + funds vault on Base Sepolia. Holds deposits, stores per-user rules, executes splits (executor-only). |
+| `src/PaydayVault.sol` | Origin + funds vault on Base Sepolia. Holds deposits, stores per-user rules, executes splits (executor-only). Stable leg is any ERC-20 via `IERC20` (USDC in v2, pUSD in v1). |
 | `src/SplitExecutor.sol` | Callback contract on Base Sepolia. Authenticated entry point for Reactive callbacks; forwards splits to the vault. |
 | `src/SavingsVault.sol` | Timelocked savings (default 30-day lock per deposit). |
-| `src/MockSwapper.sol` | Fixed-rate ETH → pUSD swap (see Limitations). |
-| `src/PaydayUSD.sol` | Minimal ERC-20 demo stablecoin (pUSD). |
+| `src/UniswapSwapper.sol` | **v2.** Real ETH → USDC swap via Uniswap V3 (SwapRouter02 + QuoterV2, price floor + slippage tightening). |
+| `src/MockSwapper.sol` | **v1 only.** Fixed-rate ETH → pUSD swap (see Limitations). Also defines the `ISwapper` interface both swappers implement. |
+| `src/PaydayUSD.sol` | **v1 only.** Minimal ERC-20 demo stablecoin (pUSD). |
+| `src/IERC20.sol` | Minimal ERC-20 interface (no OpenZeppelin dependency). |
 
 ## Try it yourself (Base Sepolia testnet)
 
-You need Base Sepolia ETH (any public faucet) and `cast` (Foundry).
+You need Base Sepolia ETH (any public faucet) and `cast` (Foundry). These are the **v2** addresses (real USDC swap); v1 is listed above.
 
 ```bash
-VAULT=0x929eb93b766fe9099aEfeF7640E88D89F6bf7936
+VAULT=0x5321c59cfed976f5e3cabb11a9d899593b629e90
 RPC=https://sepolia.base.org
 
 # 1. (Optional) Set your own split — 50% savings, 20% stable, 30% stays.
@@ -172,7 +247,7 @@ cast send --rpc-url $RPC --private-key $KEY $VAULT "deposit()" --value 0.001ethe
 # 3. Wait ~5 seconds, then check the split.
 cast call --rpc-url $RPC $VAULT "availableOf(address)(uint256)" $YOU
 cast call --rpc-url $RPC $VAULT "stableOf(address)(uint256)" $YOU
-cast call --rpc-url $RPC 0xa8a343f37119d15d16b16988CAb60A0468608c4e "lockIdsOf(address)(uint256[])" $YOU
+cast call --rpc-url $RPC 0x8c17429da93e1545e516216869c0913ac1823303 "lockIdsOf(address)(uint256[])" $YOU
 ```
 
 Watch the loop live: the deposit emits `DepositReceived`, `PaydaySplit` on Lasna fires `SplitRequested` within a block or two, and the callback lands on Base Sepolia seconds later. Every leg is linked on the [dashboard](https://andipangeranm142.github.io/payday-split/).
@@ -181,16 +256,17 @@ Watch the loop live: the deposit emits `DepositReceived`, `PaydaySplit` on Lasna
 
 ```bash
 forge build
-forge test        # 55 tests, 10 suites — vault, swapper, savings, reactive, executor, plus edge-case + fuzz suites
+forge test        # 67 tests, 12 suites — vault, swapper, savings, reactive, executor, plus edge-case + fuzz suites and 2 fork tests against the live Uniswap pool
 ```
 
-Deploy scripts live in `script/` (`DeployBase`, `DeployReactive`, `DeployExecutor`). Deploy order matters: Base contracts → reactive contract (needs the vault address) → executor (needs the reactive address) → wire executor on both sides → fund both (reactive in lREACT, executor in Base Sepolia ETH).
+Deploy scripts live in `script/` (`DeployBase`, `DeployBaseV2`, `DeployReactive`, `DeployExecutor`). Deploy order matters: Base contracts → reactive contract (needs the vault address) → executor (needs the reactive address) → wire executor on both sides → fund both (reactive in lREACT, executor in Base Sepolia ETH).
 
 ## Honest limitations
 
-- **The swap is a demo swapper.** `MockSwapper` converts ETH → pUSD at a fixed, owner-set rate (default 1 ETH = 2000 pUSD). It does not route through a DEX. The vault only talks to it through the `ISwapper` interface, so a production deployment plugs in a real DEX adapter with no vault changes. The reactive automation — the point of this project — is fully real.
-- **pUSD is a demo token** with no value; it exists so the stablecoin leg produces a real, withdrawable balance.
-- **Lasna charges 100 gwei base fee**, so each `react()` costs ~0.02 lREACT. The reactive contract is funded for a handful of demo loops; a production deployment funds it from a treasury or a small fee on splits.
+- **v1's swap is a demo swapper.** `MockSwapper` converts ETH → pUSD at a fixed, owner-set rate (default 1 ETH = 2000 pUSD). It does not route through a DEX. **v2 fixes this**: `UniswapSwapper` swaps ETH → real Circle USDC through Uniswap V3. The v1 contracts stay live for the record.
+- **pUSD is a demo token** (v1 only) with no value; it exists so the v1 stablecoin leg produces a real, withdrawable balance.
+- **The testnet pool price is not the real ETH price.** The Base Sepolia WETH/USDC pool prices ETH at ~$26,500 — testnet pools are seeded arbitrarily. v2's USDC amounts reflect that pool price; the swap route itself is the production Uniswap path.
+- **Lasna charges 100 gwei base fee**, so each `react()` costs ~0.02 lREACT. The reactive contracts are funded for a handful of demo loops; a production deployment funds them from a treasury or a small fee on splits.
 - **Testnet only.** Nothing here has touched mainnet or real funds.
 
 ## License

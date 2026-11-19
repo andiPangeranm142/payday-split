@@ -214,7 +214,7 @@
           </div>
           <div class="dest d-stable">
             <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 16V4M7 4L3 8M7 4l4 4M17 8v12m0 0 4-4m-4 4-4-4"/></svg></div>
-            <div><b>30% · Stablecoin</b><span>swapped to pUSD</span></div>
+            <div><b>30% · Stablecoin</b><span>swapped to USDC via Uniswap V3</span></div>
           </div>
           <div class="dest d-spend">
             <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg></div>
@@ -222,7 +222,7 @@
           </div>
         </div>
       </div>
-      <p class="flow-caption">One deposit in, three destinations out — <b>~2 seconds</b> end to end, no bot watching, no keeper to pay.</p>
+      <p class="flow-caption">One deposit in, three destinations out — <b>~1 second</b> end to end, no bot watching, no keeper to pay.</p>
     </div>
 
     <div class="splitbar" role="img" aria-label="Default split: 30 percent savings, 30 percent stablecoin, 40 percent spendable">
@@ -240,7 +240,7 @@
     </div>
     <div class="card">
       <div class="stat-ic v"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
-      <h2>End-to-end latency</h2><div class="big">~2s</div><div class="sub">deposit block → callback block, measured live</div>
+      <h2>End-to-end latency</h2><div class="big">~1s</div><div class="sub">deposit block → callback block, measured live (v2)</div>
     </div>
     <div class="card">
       <div class="stat-ic s"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></div>
@@ -255,7 +255,7 @@
     <div class="arrow">→</div>
     <div class="step"><div class="num">3</div><div class="k">Callback</div><h3>Money moves</h3><p>An authenticated callback reaches the executor, which tells the vault to split the deposit.</p><span class="chain">Base Sepolia</span></div>
     <div class="arrow">→</div>
-    <div class="step"><div class="num">4</div><div class="k">Split</div><h3>Three destinations</h3><p>Savings locks for 30 days, the stable slice becomes pUSD, the rest stays spendable.</p><span class="chain">Base Sepolia</span></div>
+    <div class="step"><div class="num">4</div><div class="k">Split</div><h3>Three destinations</h3><p>Savings locks for 30 days, the stable slice becomes real USDC via Uniswap V3, the rest stays spendable.</p><span class="chain">Base Sepolia</span></div>
   </div>
 
   <h2 class="section">Live <span class="grad">balances</span></h2>
@@ -263,7 +263,7 @@
   <div class="card">
     <div class="grid cols3" style="margin-top:0">
       <div><h2>Spendable</h2><div class="big bal-accent-locks" id="bal-available"><span class="skeleton">…</span></div><div class="sub">ETH in the vault, withdrawable anytime</div></div>
-      <div><h2>Stablecoin</h2><div class="big bal-accent-stable" id="bal-stable"><span class="skeleton">…</span></div><div class="sub">pUSD credited from swaps</div></div>
+      <div><h2>Stablecoin</h2><div class="big bal-accent-stable" id="bal-stable"><span class="skeleton">…</span></div><div class="sub">real USDC credited from Uniswap swaps (v2)</div></div>
       <div><h2>Savings locks</h2><div class="big bal-accent-save" id="bal-locks"><span class="skeleton">…</span></div><div class="sub" id="bal-locks-sub">timelocked 30 days each</div></div>
     </div>
     <div class="lookup">
@@ -274,7 +274,38 @@
   </div>
 
   <h2 class="section">Verified <span class="grad">full loops</span></h2>
-  <p class="section-sub">Five complete deposit → react → callback runs, every leg linked to its explorer.</p>
+  <p class="section-sub">Eight complete deposit → react → callback runs across two versions, every leg linked to its explorer.</p>
+  <h3 style="font-family:Sora,sans-serif;font-size:16px;margin:18px 0 8px">v2 — real Uniswap swap <span class="pill ok">current</span></h3>
+  <div class="card" style="padding:8px 10px">
+    <table>
+      <thead><tr><th>Loop</th><th>Deposit</th><th>Reactive</th><th>Callback split</th><th>Result</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><b>v2-1</b><br><span class="sub">0.0002 ETH · default 30/30/40</span></td>
+          <td><span class="pill base">Base Sepolia</span><br><a class="mono" href="https://sepolia.basescan.org/tx/0x23ee6e0b00ff24c8d48dd1b50341af213ccfe4a30328411b35f3fcc3ac5edc0c">0x23ee6e0b…dc0c</a></td>
+          <td><span class="pill lasna">Lasna</span><br><a class="mono" href="https://lasna.reactscan.net/tx/0xef91c9b85ac4cb37c40f1dd702b1d6309128ef50c4fd1f5387445daad32ead39">0xef91c9b8…ad39</a></td>
+          <td><span class="pill base">Base Sepolia</span><br><a class="mono" href="https://sepolia.basescan.org/tx/0x3367ff4b8ca8a6dd5e51fa19383614eb8b8ef90e8c2112d52d5ba5e19e81ec38">0x3367ff4b…ec38</a></td>
+          <td><span class="pill ok">Verified</span><br><span class="sub">0.00006 ETH locked · 1.593174 USDC · 0.00008 ETH spendable · 1s</span></td>
+        </tr>
+        <tr>
+          <td><b>v2-2</b><br><span class="sub">0.0002 ETH · custom 50/25/25</span></td>
+          <td><span class="pill base">Base Sepolia</span><br><a class="mono" href="https://sepolia.basescan.org/tx/0xeeba5b5a9d3f1a29a87475c42ff065e786ba6eb2484652269817d3957029837f">0xeeba5b5a…837f</a></td>
+          <td><span class="pill lasna">Lasna</span><br><a class="mono" href="https://lasna.reactscan.net/tx/0xa12185eee005c28ac69a60c38afade04cad702e94727144091ac454adf08236f">0xa12185ee…236f</a></td>
+          <td><span class="pill base">Base Sepolia</span><br><a class="mono" href="https://sepolia.basescan.org/tx/0x81b8296eec0144b02224a00920c7a1b29a8be45d1f1a4459b1649d209f29fd4c">0x81b8296e…fd4c</a></td>
+          <td><span class="pill ok">Verified</span><br><span class="sub">0.0001 ETH locked · 1.326204 USDC · 0.00005 ETH spendable · 1s</span></td>
+        </tr>
+        <tr>
+          <td><b>v2-3</b><br><span class="sub">0.0001 ETH · custom 10/80/10</span></td>
+          <td><span class="pill base">Base Sepolia</span><br><a class="mono" href="https://sepolia.basescan.org/tx/0x004a75f488790c3907a83a0e6645b4799f2f0465b8418224d7a262af95227ecb">0x004a75f4…27ecb</a></td>
+          <td><span class="pill lasna">Lasna</span><br><a class="mono" href="https://lasna.reactscan.net/tx/0x0d40933441493a60cfdc629f2595f465b5be0adc892c5e07469a5ead813463f3">0x0d409334…63f3</a></td>
+          <td><span class="pill base">Base Sepolia</span><br><a class="mono" href="https://sepolia.basescan.org/tx/0x7571eb4dd396ebb0aee1f30bb7a27d4df2b04d95fa2acaed6aa14b96eeef21c1">0x7571eb4d…21c1</a></td>
+          <td><span class="pill ok">Verified</span><br><span class="sub">0.00001 ETH locked · 2.127468 USDC · 0.00001 ETH spendable · 1s</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="sub" style="margin-top:10px">v2 totals: 0.0005 ETH deposited → 0.00017 ETH locked · <b style="color:var(--text)">5.046846 USDC</b> out · 0.00014 ETH spendable. The testnet pool prices ETH at ~$26,500 (seeded arbitrarily); the swap route is the production Uniswap path.</p>
+  <h3 style="font-family:Sora,sans-serif;font-size:16px;margin:22px 0 8px">v1 — mock swapper + pUSD</h3>
   <div class="card" style="padding:8px 10px">
     <table>
       <thead><tr><th>Loop</th><th>Deposit</th><th>Reactive</th><th>Callback split</th><th>Result</th></tr></thead>
@@ -318,8 +349,17 @@
     </table>
   </div>
   <details class="card" style="padding:12px 16px;margin-top:10px">
-    <summary style="cursor:pointer"><b>Full transaction hashes</b> <span class="sub">— every leg, all five loops</span></summary>
+    <summary style="cursor:pointer"><b>Full transaction hashes</b> <span class="sub">— every leg, all eight loops (v2 + v1)</span></summary>
     <div style="margin-top:10px;font-size:13px;line-height:1.9">
+      <b>Loop v2-1</b> — deposit <a class="mono" href="https://sepolia.basescan.org/tx/0x23ee6e0b00ff24c8d48dd1b50341af213ccfe4a30328411b35f3fcc3ac5edc0c" style="word-break:break-all">0x23ee6e0b00ff24c8d48dd1b50341af213ccfe4a30328411b35f3fcc3ac5edc0c</a><br>
+      <span style="margin-left:52px">reactive <a class="mono" href="https://lasna.reactscan.net/tx/0xef91c9b85ac4cb37c40f1dd702b1d6309128ef50c4fd1f5387445daad32ead39" style="word-break:break-all">0xef91c9b85ac4cb37c40f1dd702b1d6309128ef50c4fd1f5387445daad32ead39</a><br></span>
+      <span style="margin-left:52px">callback <a class="mono" href="https://sepolia.basescan.org/tx/0x3367ff4b8ca8a6dd5e51fa19383614eb8b8ef90e8c2112d52d5ba5e19e81ec38" style="word-break:break-all">0x3367ff4b8ca8a6dd5e51fa19383614eb8b8ef90e8c2112d52d5ba5e19e81ec38</a></span><br>
+      <b>Loop v2-2</b> — deposit <a class="mono" href="https://sepolia.basescan.org/tx/0xeeba5b5a9d3f1a29a87475c42ff065e786ba6eb2484652269817d3957029837f" style="word-break:break-all">0xeeba5b5a9d3f1a29a87475c42ff065e786ba6eb2484652269817d3957029837f</a><br>
+      <span style="margin-left:52px">reactive <a class="mono" href="https://lasna.reactscan.net/tx/0xa12185eee005c28ac69a60c38afade04cad702e94727144091ac454adf08236f" style="word-break:break-all">0xa12185eee005c28ac69a60c38afade04cad702e94727144091ac454adf08236f</a><br></span>
+      <span style="margin-left:52px">callback <a class="mono" href="https://sepolia.basescan.org/tx/0x81b8296eec0144b02224a00920c7a1b29a8be45d1f1a4459b1649d209f29fd4c" style="word-break:break-all">0x81b8296eec0144b02224a00920c7a1b29a8be45d1f1a4459b1649d209f29fd4c</a></span><br>
+      <b>Loop v2-3</b> — deposit <a class="mono" href="https://sepolia.basescan.org/tx/0x004a75f488790c3907a83a0e6645b4799f2f0465b8418224d7a262af95227ecb" style="word-break:break-all">0x004a75f488790c3907a83a0e6645b4799f2f0465b8418224d7a262af95227ecb</a><br>
+      <span style="margin-left:52px">reactive <a class="mono" href="https://lasna.reactscan.net/tx/0x0d40933441493a60cfdc629f2595f465b5be0adc892c5e07469a5ead813463f3" style="word-break:break-all">0x0d40933441493a60cfdc629f2595f465b5be0adc892c5e07469a5ead813463f3</a><br></span>
+      <span style="margin-left:52px">callback <a class="mono" href="https://sepolia.basescan.org/tx/0x7571eb4dd396ebb0aee1f30bb7a27d4df2b04d95fa2acaed6aa14b96eeef21c1" style="word-break:break-all">0x7571eb4dd396ebb0aee1f30bb7a27d4df2b04d95fa2acaed6aa14b96eeef21c1</a></span><br>
       <b>Loop 1</b> — deposit <a class="mono" href="https://sepolia.basescan.org/tx/0xa14ec0b9c0d93a24cc7735b17646d92ee240ff7c216d8c920f377b5fb90f7400" style="word-break:break-all">0xa14ec0b9c0d93a24cc7735b17646d92ee240ff7c216d8c920f377b5fb90f7400</a><br>
       <span style="margin-left:52px">reactive <a class="mono" href="https://lasna.reactscan.net/tx/0x0487d4312546a879d8077b24857e04c371fe302b3d49d6ede78621b52113c94c" style="word-break:break-all">0x0487d4312546a879d8077b24857e04c371fe302b3d49d6ede78621b52113c94c</a><br></span>
       <span style="margin-left:52px">callback <a class="mono" href="https://sepolia.basescan.org/tx/0x27cfe0f7d539c3ae0ea176bdb9f11251cd2d499e5efe85473849e96696bc1300" style="word-break:break-all">0x27cfe0f7d539c3ae0ea176bdb9f11251cd2d499e5efe85473849e96696bc1300</a></span><br>
@@ -348,7 +388,17 @@
   </div>
 
   <h2 class="section">Smart <span class="grad">contracts</span></h2>
-  <p class="section-sub">All six Sourcify-verified. Testnet only — no mainnet, no real funds.</p>
+  <p class="section-sub">All v2 and v1 contracts Sourcify-verified. Testnet only — no mainnet, no real funds.</p>
+  <h3 style="font-family:Sora,sans-serif;font-size:16px;margin:18px 0 8px">v2 — current <span class="pill ok">real Uniswap swap</span></h3>
+  <div class="card">
+    <div class="addr-row"><b>PaydaySplit v2 <span class="pill lasna">Lasna · reactive</span></b><a class="mono" href="https://lasna.reactscan.net/address/0x973112e077258b0b16a0a20ca237270a8ea6f993">0x973112e077258b0b16a0a20ca237270a8ea6f993</a></div>
+    <div class="addr-row"><b>PaydayVault v2 <span class="pill base">Base Sepolia · origin</span></b><a class="mono" href="https://sepolia.basescan.org/address/0x5321c59cfed976f5e3cabb11a9d899593b629e90">0x5321c59cfed976f5e3cabb11a9d899593b629e90</a></div>
+    <div class="addr-row"><b>SplitExecutor v2 <span class="pill base">Base Sepolia · callback</span></b><a class="mono" href="https://sepolia.basescan.org/address/0xf654ecc5fbc173e1b7fbf46f870fe549e96d4778">0xf654ecc5fbc173e1b7fbf46f870fe549e96d4778</a></div>
+    <div class="addr-row"><b>SavingsVault v2 <span class="pill base">Base Sepolia</span></b><a class="mono" href="https://sepolia.basescan.org/address/0x8c17429da93e1545e516216869c0913ac1823303">0x8c17429da93e1545e516216869c0913ac1823303</a></div>
+    <div class="addr-row"><b>UniswapSwapper <span class="pill base">Base Sepolia</span></b><a class="mono" href="https://sepolia.basescan.org/address/0x379a5a89f007d93ecf70777713cf036690405716">0x379a5a89f007d93ecf70777713cf036690405716</a></div>
+    <div class="addr-row"><b>USDC (Circle) <span class="pill base">Base Sepolia</span></b><a class="mono" href="https://sepolia.basescan.org/address/0x036CbD53842c5426634e7929541eC2318f3dCF7e">0x036CbD53842c5426634e7929541eC2318f3dCF7e</a></div>
+  </div>
+  <h3 style="font-family:Sora,sans-serif;font-size:16px;margin:22px 0 8px">v1 — mock swapper + pUSD</h3>
   <div class="card">
     <div class="addr-row"><b>PaydaySplit <span class="pill lasna">Lasna · reactive</span></b><a class="mono" href="https://lasna.reactscan.net/address/0x8149417d4977284765D3033cd89B1233DB49BcCc">0x8149417d4977284765D3033cd89B1233DB49BcCc</a></div>
     <div class="addr-row"><b>PaydayVault <span class="pill base">Base Sepolia · origin</span></b><a class="mono" href="https://sepolia.basescan.org/address/0x929eb93b766fe9099aEfeF7640E88D89F6bf7936">0x929eb93b766fe9099aEfeF7640E88D89F6bf7936</a></div>
@@ -358,7 +408,7 @@
     <div class="addr-row"><b>PaydayUSD (pUSD) <span class="pill base">Base Sepolia</span></b><a class="mono" href="https://sepolia.basescan.org/address/0xe78B98f37C6C5CeB1ef81808dDaaE23Ff23bDabb">0xe78B98f37C6C5CeB1ef81808dDaaE23Ff23bDabb</a></div>
   </div>
 
-  <div class="note"><b>Honest limitation.</b> The stablecoin leg uses a fixed-rate demo swapper (1 ETH = 2000 pUSD) — it does not route through a DEX. The vault talks to it only through an <span class="mono">ISwapper</span> interface, so a production deployment plugs in a real DEX adapter with no vault changes. The reactive automation itself is fully real, as the verified loops above show.</div>
+  <div class="note"><b>Honest limitation.</b> v1's stablecoin leg used a fixed-rate demo swapper (1 ETH = 2000 pUSD) — it did not route through a DEX. <b style="color:var(--text)">v2 fixes that:</b> the stable slice now swaps through Uniswap V3 for real Circle USDC. The testnet pool prices ETH at ~$26,500 (testnet pools are seeded arbitrarily), so v2's USDC amounts reflect the testnet price — the swap route itself is the production Uniswap path.</div>
 
   <footer>
     <span>Payday Split · Reactive Omni Buildathon — Set It and Forget It</span>
@@ -374,10 +424,10 @@ import { ethers } from "ethers";
 (function(){
   var BASE_RPC = "https://sepolia.base.org";
   var LASNA_RPC = "https://lasna-rpc.rnk.dev/";
-  var VAULT = "0x929eb93b766fe9099aEfeF7640E88D89F6bf7936";
-  var SAVINGS = "0xa8a343f37119d15d16b16988CAb60A0468608c4e";
-  var REACTIVE = "0x8149417d4977284765D3033cd89B1233DB49BcCc";
-  var EXECUTOR = "0xfb07307Bc96c3Ea04aa82F74a92e6C5075C549a4";
+  var VAULT = "0x5321c59cfed976f5e3cabb11a9d899593b629e90";
+  var SAVINGS = "0x8c17429da93e1545e516216869c0913ac1823303";
+  var REACTIVE = "0x973112e077258b0b16a0a20ca237270a8ea6f993";
+  var EXECUTOR = "0xf654ecc5fbc173e1b7fbf46f870fe549e96d4778";
   var DEMO = "0x16Db2156631c1Da81ea47DbD05605d3CE44589a1";
 
   var VAULT_ABI = [
@@ -393,7 +443,7 @@ import { ethers } from "ethers";
 
   function $(id){ return document.getElementById(id); }
   function fmtEth(w){ var s = ethers.formatEther(w); var n = parseFloat(s); return (n >= 0.0001 ? n.toFixed(4) : n.toPrecision(2)) + " ETH"; }
-  function fmtPusd(w){ var n = parseFloat(ethers.formatEther(w)); return n.toFixed(2) + " pUSD"; }
+  function fmtUsdc(w){ var n = parseFloat(ethers.formatUnits(w, 6)); return n.toFixed(2) + " USDC"; }
   function short(a){ return a.slice(0,6) + "…" + a.slice(-4); }
 
   var base = new ethers.JsonRpcProvider(BASE_RPC);
@@ -404,7 +454,7 @@ import { ethers } from "ethers";
 
   function loadStats(){
     reactive.splitsRequested().then(function(n){ $("stat-splits").textContent = n.toString(); })
-      .catch(function(){ $("stat-splits").textContent = "2"; });
+      .catch(function(){ $("stat-splits").textContent = "3"; });
     lasna.getBalance(REACTIVE).then(function(b){ $("stat-reactive").textContent = parseFloat(ethers.formatEther(b)).toFixed(3) + " lREACT"; })
       .catch(function(){ $("stat-reactive").textContent = "—"; });
     base.getBalance(EXECUTOR).then(function(b){ $("stat-executor").textContent = parseFloat(ethers.formatEther(b)).toFixed(4); })
@@ -417,7 +467,7 @@ import { ethers } from "ethers";
     $("bal-stable").innerHTML = '<span class="skeleton">…</span>';
     $("bal-locks").innerHTML = '<span class="skeleton">…</span>';
     vault.availableOf(addr).then(function(v){ $("bal-available").textContent = fmtEth(v); }).catch(function(){ $("bal-available").textContent = "—"; });
-    vault.stableOf(addr).then(function(v){ $("bal-stable").textContent = fmtPusd(v); }).catch(function(){ $("bal-stable").textContent = "—"; });
+    vault.stableOf(addr).then(function(v){ $("bal-stable").textContent = fmtUsdc(v); }).catch(function(){ $("bal-stable").textContent = "—"; });
     vault.effectiveRules(addr).then(function(r){
       $("addr-rules").textContent = "rules " + (Number(r[0])/100) + "% savings / " + (Number(r[1])/100) + "% stable / " + ((10000-Number(r[0])-Number(r[1]))/100) + "% spendable";
     }).catch(function(){ $("addr-rules").textContent = "rules —"; });
