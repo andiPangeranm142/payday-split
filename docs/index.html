@@ -338,6 +338,14 @@
     </div>
   </details>
 
+  <h2 class="section">Withdrawals &amp; <span class="grad">edge cases</span></h2>
+  <p class="section-sub">Money coming back out, and the guard that ignores dust — all verified live.</p>
+  <div class="card" style="padding:12px 16px;font-size:13px;line-height:1.9">
+    <b>Withdraw spendable</b> — 0.0001 ETH out via <span class="mono">withdraw()</span>: <a class="mono" href="https://sepolia.basescan.org/tx/0xafefa6537897bccdc46db4135f1a33125324fdc8ff2b01464d4d6b8691c4c16d">0xafefa653…4c16d</a> (block 60779172)<br>
+    <b>Withdraw stablecoin</b> — 0.2 pUSD out via <span class="mono">withdrawStable()</span>: <a class="mono" href="https://sepolia.basescan.org/tx/0x4004d224e62f34e39d1de28401fa738b5358eaf0ad1d3d6a8bf78267a09bb28a">0x4004d224…bb28a</a> (block 60779179)<br>
+    <b>Dust guard</b> — a 0.00005 ETH deposit (below the 0.0001 minimum) was correctly skipped: deposit <a class="mono" href="https://sepolia.basescan.org/tx/0x690e52c633cceed94a9fe54918695cfb5b59cfae5042e48f4187035987d9b744">0x690e52c6…9b744</a>, <span class="mono">DepositSkipped</span> on Lasna <a class="mono" href="https://lasna.reactscan.net/tx/0x66f7ea679bd3ecdb7db5574b27f8890c87a0e375329cfe97e933dbe8ba694444">0x66f7ea67…94444</a> — <span class="mono">depositsSkipped</span> 0 → 1, funds stay spendable, never lost.
+  </div>
+
   <h2 class="section">Smart <span class="grad">contracts</span></h2>
   <p class="section-sub">All six Sourcify-verified. Testnet only — no mainnet, no real funds.</p>
   <div class="card">

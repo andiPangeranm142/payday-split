@@ -80,7 +80,28 @@ Result: 0.0001 ETH locked in savings (lock #3), 0.1 pUSD credited, 0.00005 ETH s
 
 Result: 0.00001 ETH locked in savings (lock #4), 0.16 pUSD credited, 0.00001 ETH spendable. Deposit block → callback block: **1 second**.
 
-Across all five loops: **5 deposits processed, 0 skipped** (`depositsSkipped == 0` on-chain), 5 savings locks created, 0.8 pUSD credited in total — with four different rule sets (default 30/30/40, 50/20/30, 50/25/25, 10/80/10), proving the split follows whatever rules the user set at deposit time.
+Across all five loops: **5 deposits processed, 1 correctly skipped** (a below-minimum deposit, see Edge cases below — `depositsSkipped == 1` on-chain, by design), 5 savings locks created, 0.8 pUSD credited in total — with four different rule sets (default 30/30/40, 50/20/30, 50/25/25, 10/80/10), proving the split follows whatever rules the user set at deposit time.
+
+## Withdrawals (verified live)
+
+Both withdrawal paths have been executed on-chain by the demo wallet — the money actually comes back out:
+
+| Withdrawal | Transaction |
+| --- | --- |
+| Spendable ETH — `withdraw(0.0001 ETH)` (Base Sepolia block 60779172) | [`0xafefa653…4c16d`](https://sepolia.basescan.org/tx/0xafefa6537897bccdc46db4135f1a33125324fdc8ff2b01464d4d6b8691c4c16d) |
+| Stablecoin — `withdrawStable(0.2 pUSD)` (Base Sepolia block 60779179) | [`0x4004d224…bb28a`](https://sepolia.basescan.org/tx/0x4004d224e62f34e39d1de28401fa738b5358eaf0ad1d3d6a8bf78267a09bb28a) |
+
+After both: `availableOf` 0.00044 → 0.00034 ETH, `stableOf` 0.8 → 0.6 pUSD, and the wallet holds 0.2 pUSD directly. Savings-lock withdrawal is covered by the Foundry suite; a live demonstration on a byte-identical demo instance (1-hour lock, same codehash as the submitted vault) is in progress — its lock #0 unlocks 19 Nov 2026 16:23 WIB. The submitted vault's locks mature 14 Dec 2026.
+
+## Edge cases (verified live)
+
+- **Dust deposit (below minimum).** A 0.00005 ETH deposit — half the 0.0001 ETH `minDeposit` — was correctly ignored by the reactive contract: [`0x690e52c6…9b744`](https://sepolia.basescan.org/tx/0x690e52c633cceed94a9fe54918695cfb5b59cfae5042e48f4187035987d9b744) (Base Sepolia block 60779239). On Lasna it emitted `DepositSkipped` with reason `below-minimum`: [`0x66f7ea67…94444`](https://lasna.reactscan.net/tx/0x66f7ea679bd3ecdb7db5574b27f8890c87a0e375329cfe97e933dbe8ba694444) (Lasna block 8720620). `depositsSkipped` went 0 → 1, `splitsRequested` stayed 5, and the deposit remains safely spendable in the vault (never split, never lost). The exact boundary is also covered in tests (`testMinDepositBoundary`: `minDeposit - 1` skips, `minDeposit` processes).
+- **Rule extremes.** Loops 4–5 ran opposite rule sets (50/25/25 and 10/80/10); the fuzz suite (`testFuzzSplitAccounting`, 256 runs) proves spendable + locked + swapped == deposit for every deposit size and every valid rule combination, including 0/0 (all spendable) and 100% (nothing stays spendable).
+- **Pause safety.** A paused reactive contract skips deposits without marking them processed, so they can be retried after unpausing — proven in `testReactAfterUnpause`.
+
+## Reactive funding
+
+The reactive contract is funded in lREACT for its `react()` calls and callback requests (topped up 19 Nov 2026: +0.05 then +0.04 lREACT; balance ~0.061 lREACT, enough for several more loops). Outstanding debt is 0 on both the reactive contract and the callback executor — verified 19 Nov 2026 by calling `coverDebt()` on each ([reactive](https://lasna.reactscan.net/tx/0x0534d25fc00d97f0211f31a2d119fe67de2574ddfcabbdabda57e8c59eeb7e4c), [executor](https://sepolia.basescan.org/tx/0x20bd725ae7437de76bbffb627a5f183be5d6e1500a0b5bd419c0ae8673944dde)): both balances were unchanged afterwards, proving no debt was outstanding.
 
 📊 **Live dashboard:** https://andipangeranm142.github.io/payday-split/ — rules, live balances, split history, and explorer links, read straight from the public RPCs.
 
